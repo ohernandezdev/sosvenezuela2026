@@ -1,4 +1,5 @@
 import LandingClient from './LandingClient';
+import HomeStatic from './HomeStatic';
 import pool from '@/lib/db';
 import type { HazardEvent } from './sse-provider';
 
@@ -46,5 +47,7 @@ async function getPstats(): Promise<PStats | null> {
 
 export default async function Page() {
   const [initialReports, initialPstats] = await Promise.all([getReports(), getPstats()]);
-  return <LandingClient initialReports={initialReports} initialPstats={initialPstats} />;
+  // HomeStatic se pasa como prop (Server Component): su HTML se renderiza en el
+  // servidor sin sumar JS al bundle del cliente.
+  return <LandingClient initialReports={initialReports} initialPstats={initialPstats} staticSections={<HomeStatic />} />;
 }

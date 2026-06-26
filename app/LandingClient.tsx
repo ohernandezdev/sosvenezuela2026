@@ -1,8 +1,9 @@
 'use client';
 import dynamic from 'next/dynamic';
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useState, useMemo, useRef, type ReactNode } from 'react';
 import { m as Motion, AnimatePresence, useReducedMotion, type Variants } from 'framer-motion';
 import Link from 'next/link';
+import FlagVE from '@/components/FlagVE';
 import { useSse, HazardEvent, ChatEvent } from './sse-provider';
 
 // Componentes bajo el pliegue (carruseles, noticias, tweets): cada uno es un
@@ -81,18 +82,6 @@ const CAT_META: Record<string, { icon: string; label: string }> = {
   aid_point: { icon: '📦', label: 'Punto de ayuda' },
 };
 
-/* Crisp CSS Venezuelan flag — renders identically on every OS. */
-function FlagVE({ size = 28 }: { size?: number }) {
-  return (
-    <span aria-label="Venezuela" role="img"
-      style={{
-        display: 'inline-block', width: size, height: Math.round(size * 0.68),
-        borderRadius: 5, flexShrink: 0, verticalAlign: 'middle',
-        background: 'linear-gradient(#FFCC00 0 33.33%, #00247D 33.33% 66.66%, #CF142B 66.66% 100%)',
-        boxShadow: '0 1px 2px rgba(11,18,32,0.18)', border: '1px solid rgba(11,18,32,0.08)',
-      }} />
-  );
-}
 
 type FlyTarget = { id: string; lat: number; lng: number; nonce: number } | null;
 
@@ -100,9 +89,12 @@ const stagger: Variants = { hidden: {}, show: { transition: { staggerChildren: 0
 const rise: Variants = { hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 130, damping: 18 } } };
 
 type PStats = { missing: number; found: number; total: number };
-interface LandingProps { initialReports?: HazardEvent[]; initialPstats?: PStats | null }
+// staticSections es un Server Component (las secciones estáticas del pie) pasado
+// como prop desde app/page.tsx, así su HTML se renderiza en el servidor y NO
+// aporta JS al bundle del cliente.
+interface LandingProps { initialReports?: HazardEvent[]; initialPstats?: PStats | null; staticSections?: ReactNode }
 
-export default function LandingClient({ initialReports = [], initialPstats = null }: LandingProps) {
+export default function LandingClient({ initialReports = [], initialPstats = null, staticSections = null }: LandingProps) {
   // Los datos vienen prerenderizados desde el servidor (ver app/page.tsx), así
   // el HTML ya llega con reportes y cifras: en 3G se evita la cascada
   // "descargar JS → hidratar → fetch → render".
@@ -451,83 +443,8 @@ export default function LandingClient({ initialReports = [], initialPstats = nul
           <BalancePanel />
         </section>
 
-        {/* ── CTAs ───────────────────────────────── */}
-        <section className="px-4 max-w-6xl mx-auto mb-12">
-          <Motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}
-            className="grid sm:grid-cols-3 gap-4">
-            {[
-              { icon: '📍', title: 'Reportar daño', desc: 'Marca edificios colapsados, fugas de gas, vías bloqueadas o personas atrapadas.', href: '/reportar', color: '#0D9488', bg: 'rgba(240,253,250,0.9)' },
-              { icon: '🔎', title: 'Buscar persona', desc: 'Busca a un familiar por cédula, teléfono o nombre. Activa avisos en tiempo real.', href: '/buscar', color: '#0EA5E9', bg: 'rgba(240,249,255,0.9)' },
-              { icon: '🩹', title: 'Primeros auxilios', desc: '12 guías basadas en Cruz Roja, OMS y FEMA. Disponibles sin conexión.', href: '/recomendaciones', color: '#7C3AED', bg: 'rgba(245,243,255,0.9)' },
-            ].map(item => (
-              <Motion.div key={item.href} variants={rise}>
-                <Link href={item.href}>
-                  <Motion.div whileHover={{ y: -5 }} whileTap={{ scale: 0.98 }} transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                    className="rounded-3xl p-6 h-full cursor-pointer sheen-card"
-                    style={{ background: item.bg, border: `1px solid ${item.color}22`, boxShadow: 'var(--shadow-sm)' }}>
-                    <div className="text-3xl mb-3">{item.icon}</div>
-                    <div className="font-display font-bold text-lg mb-2" style={{ color: 'var(--text-1)' }}>{item.title}</div>
-                    <p className="text-sm leading-relaxed" style={{ color: 'var(--text-2)' }}>{item.desc}</p>
-                    <div className="mt-4 text-xs font-bold" style={{ color: item.color }}>
-                      {item.href === '/recomendaciones' ? 'Ver guías →' : 'Ir →'}
-                    </div>
-                  </Motion.div>
-                </Link>
-              </Motion.div>
-            ))}
-          </Motion.div>
-        </section>
-
-        {/* ── FIRST AID PREVIEW ──────────────────── */}
-        <section className="px-4 max-w-6xl mx-auto mb-12">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display text-xl sm:text-2xl font-bold" style={{ color: 'var(--text-1)' }}>Primeros auxilios — más urgentes</h2>
-            <Link href="/recomendaciones" className="text-xs font-bold whitespace-nowrap" style={{ color: 'var(--primary)' }}>Ver las 12 guías →</Link>
-          </div>
-          <Motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}
-            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { icon: '🏠', title: 'Durante el sismo', tip: 'Agáchate, cúbrete y agárrate. El "triángulo de la vida" es un MITO peligroso.' },
-              { icon: '🩸', title: 'Hemorragias', tip: 'Presión directa firme. Si traspasa, añade tela encima — no retires la primera.' },
-              { icon: '❤️', title: 'RCP', tip: '100–120 compresiones/min, 5 cm profundidad. No pares hasta que llegue ayuda.' },
-              { icon: '🆘', title: 'Si quedas atrapado', tip: 'Golpea tuberías, no grites. No enciendas fuego (posible fuga de gas).' },
-            ].map(item => (
-              <Motion.div key={item.icon} variants={rise}>
-                <Link href="/recomendaciones">
-                  <Motion.div whileHover={{ y: -4 }} transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                    className="rounded-2xl p-4 h-full cursor-pointer sheen-card"
-                    style={{ background: 'rgba(255,255,255,0.9)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
-                    <div className="text-2xl mb-2">{item.icon}</div>
-                    <div className="font-display font-semibold text-sm mb-1.5" style={{ color: 'var(--text-1)' }}>{item.title}</div>
-                    <p className="text-xs leading-relaxed" style={{ color: 'var(--text-2)' }}>{item.tip}</p>
-                  </Motion.div>
-                </Link>
-              </Motion.div>
-            ))}
-          </Motion.div>
-        </section>
-
-        {/* ── FOOTER ─────────────────────────────── */}
-        <footer className="px-4 py-9 max-w-6xl mx-auto" style={{ borderTop: '1px solid var(--border)' }}>
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <FlagVE size={30} />
-              <div>
-                <div className="font-display font-bold text-sm" style={{ color: 'var(--text-1)' }}>SOS Venezuela 2026</div>
-                <div className="text-xs" style={{ color: 'var(--text-3)' }}>sosvenezuela2026.com · Uso humanitario · Sin fines comerciales</div>
-              </div>
-            </div>
-            <div className="rounded-2xl px-4 py-2 text-center" style={{ background: '#FEF9C3' }}>
-              <div className="text-[11px] font-medium" style={{ color: '#713F12' }}>Emergencias Venezuela</div>
-              <div className="font-display text-2xl font-extrabold" style={{ color: '#DC2626' }}>171</div>
-            </div>
-            <div className="flex gap-4 text-xs" style={{ color: 'var(--text-3)' }}>
-              <Link href="/privacidad" className="hover:underline">Privacidad</Link>
-              <Link href="/acerca" className="hover:underline">Acerca</Link>
-              <Link href="/login" className="hover:underline">Ingresar</Link>
-            </div>
-          </div>
-        </footer>
+        {/* ── CTAs · PRIMEROS AUXILIOS · FOOTER (Server Component) ── */}
+        {staticSections}
       </div>
     </div>
   );

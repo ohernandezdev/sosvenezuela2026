@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as Motion, AnimatePresence } from 'framer-motion';
+import { thumb } from '@/lib/img';
 
 interface Sub {
   id: string; zona: string | null; municipio: string | null; building_type: string | null;
@@ -21,16 +22,16 @@ function Card({ s }: { s: Sub }) {
   const [broken, setBroken] = useState(false);
   const v = verdict(s);
   const loc = [s.zona, s.municipio].filter(Boolean).join(', ') || 'Ubicación no indicada';
-  const photo = s.photo_ids?.[0];
+  const photo = thumb(s.photo_ids?.[0], 500);
   return (
     <div className="rounded-2xl overflow-hidden h-full" style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
       <div className="relative w-full overflow-hidden" style={{ paddingTop: '70%', background: '#0B1220' }}>
         {photo && !broken ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={photo} alt="" aria-hidden referrerPolicy="no-referrer" className="absolute inset-0 w-full h-full object-cover" style={{ filter: 'blur(16px) brightness(0.6)', transform: 'scale(1.2)' }} />
+            <img src={photo} alt="" aria-hidden loading="lazy" decoding="async" referrerPolicy="no-referrer" className="absolute inset-0 w-full h-full object-cover" style={{ filter: 'blur(16px) brightness(0.6)', transform: 'scale(1.2)' }} />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={photo} alt="Daño estructural" referrerPolicy="no-referrer" className="absolute inset-0 w-full h-full object-contain" onError={() => setBroken(true)} />
+            <img src={photo} alt="Daño estructural" loading="lazy" decoding="async" referrerPolicy="no-referrer" className="absolute inset-0 w-full h-full object-contain" onError={() => setBroken(true)} />
           </>
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-4xl">🏗️</div>
@@ -79,11 +80,11 @@ export default function DamageCarousel() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <AnimatePresence mode="popLayout" initial={false}>
           {visible.map(s => (
-            <motion.div key={s.id} layout
+            <Motion.div key={s.id}
               initial={{ opacity: 0, scale: 0.94, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.94 }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}>
               <Card s={s} />
-            </motion.div>
+            </Motion.div>
           ))}
         </AnimatePresence>
       </div>

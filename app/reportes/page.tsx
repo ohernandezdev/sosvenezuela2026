@@ -1,7 +1,7 @@
 'use client';
 import dynamic from 'next/dynamic';
 import { useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m as Motion } from 'framer-motion';
 import Link from 'next/link';
 import { useSse, HazardEvent } from '../sse-provider';
 
@@ -100,7 +100,7 @@ export default function ReportesPage() {
               const m = CAT_META[r.category] || { icon: '📌', label: r.category };
               const color = r.severity ? SEV_COLORS[r.severity] : 'var(--primary)';
               return (
-                <motion.div key={r.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+                <Motion.div key={r.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
                   onClick={() => focus(r)} role="button"
                   className="rounded-2xl p-3 flex gap-3 cursor-pointer" style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
                   {r.image_url ? (
@@ -118,7 +118,7 @@ export default function ReportesPage() {
                     <div className="text-[11px] line-clamp-1" style={{ color: 'var(--text-3)' }}>📍 {[r.parroquia, r.municipio].filter(Boolean).join(', ') || 'Ubicación aproximada'}</div>
                   </div>
                   <Link href={`/reporte/${r.id}`} onClick={e => e.stopPropagation()} className="self-center text-[10px] font-bold px-2 py-1 rounded-lg flex-shrink-0" style={{ color: 'var(--primary)', background: 'rgba(13,148,136,0.08)' }}>ver →</Link>
-                </motion.div>
+                </Motion.div>
               );
             })}
             {filtered.length > 300 && <p className="text-[11px] text-center py-3" style={{ color: 'var(--text-3)' }}>Mostrando 300 de {filtered.length}. Usa los filtros para acotar.</p>}

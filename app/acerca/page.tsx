@@ -1,5 +1,5 @@
 'use client';
-import { motion } from 'framer-motion';
+import { m as Motion } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
 import Link from 'next/link';
 
@@ -7,7 +7,7 @@ export default function AcercaPage() {
   return (
     <div className="min-h-screen pb-24" style={{ background: 'var(--bg)' }}>
       <div className="max-w-lg mx-auto px-4 pt-8">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+        <Motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
 
           <div className="text-center mb-8">
             <div className="text-5xl mb-4">🇻🇪</div>
@@ -56,8 +56,8 @@ export default function AcercaPage() {
             </p>
             <div className="text-center">
               <div className="inline-block rounded-2xl p-3 mb-2" style={{ background: '#F7931A20', border: '1px solid #F7931A40' }}>
-                <img src="/binance-qr.png" alt="QR de apoyo — Binance Pay"
-                  className="w-40 h-40 mx-auto rounded-xl"
+                <img src="/binance-qr.png" alt="QR de apoyo — Binance Pay" loading="lazy" decoding="async"
+                  width={160} height={160} className="w-40 h-40 mx-auto rounded-xl"
                   onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
               </div>
               <p className="text-xs" style={{ color: 'var(--text-3)' }}>Binance Pay · Solo si puedes y quieres 🙏</p>
@@ -71,7 +71,7 @@ export default function AcercaPage() {
             </span>
           </div>
 
-        </motion.div>
+        </Motion.div>
       </div>
       <BottomNav />
     </div>

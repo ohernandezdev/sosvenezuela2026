@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { m as Motion } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
 
 const CATEGORIAS = [
@@ -69,18 +69,18 @@ export default function ReportarPage() {
 
   if (done) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg)' }}>
-      <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center p-8">
+      <Motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center p-8">
         <div className="text-6xl mb-4">✅</div>
         <h2 className="text-xl font-bold" style={{ color: 'var(--text-1)' }}>Reporte enviado</h2>
         <p className="text-sm mt-2" style={{ color: 'var(--text-2)' }}>Gracias. Aparecerá en el mapa en segundos.</p>
-      </motion.div>
+      </Motion.div>
     </div>
   );
 
   return (
     <div className="min-h-screen pb-24" style={{ background: 'var(--bg)' }}>
       <div className="max-w-lg mx-auto px-4 pt-8">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+        <Motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-1)' }}>📍 Nuevo reporte</h1>
           <p className="text-sm mb-6" style={{ color: 'var(--text-2)' }}>
             Informa lo que ves. Tu ubicación exacta NO se comparte públicamente.
@@ -91,7 +91,7 @@ export default function ReportarPage() {
             <div className="text-sm font-semibold mb-3" style={{ color: 'var(--text-1)' }}>¿Qué estás reportando?</div>
             <div className="grid grid-cols-2 gap-2">
               {CATEGORIAS.map(c => (
-                <motion.button key={c.value} whileTap={{ scale: 0.96 }}
+                <Motion.button key={c.value} whileTap={{ scale: 0.96 }}
                   onClick={() => setCat(c.value)}
                   className="text-left px-4 py-3 rounded-2xl text-sm font-medium transition-all"
                   style={{
@@ -100,26 +100,26 @@ export default function ReportarPage() {
                     color: 'var(--text-1)'
                   }}>
                   {c.label}
-                </motion.button>
+                </Motion.button>
               ))}
             </div>
           </div>
 
           {/* Severity (danger only) */}
           {cat && isDanger && (
-            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mb-6">
+            <Motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mb-6">
               <div className="text-sm font-semibold mb-3" style={{ color: 'var(--text-1)' }}>Nivel de daño</div>
               <div className="grid grid-cols-2 gap-2">
                 {SEV.map(s => (
-                  <motion.button key={s.value} whileTap={{ scale: 0.96 }}
+                  <Motion.button key={s.value} whileTap={{ scale: 0.96 }}
                     onClick={() => setSev(s.value)}
                     className="py-3 rounded-2xl text-sm font-semibold text-white transition-all"
                     style={{ background: sev === s.value ? s.color : s.color + '80', opacity: sev && sev !== s.value ? 0.5 : 1 }}>
                     {s.label}
-                  </motion.button>
+                  </Motion.button>
                 ))}
               </div>
-            </motion.div>
+            </Motion.div>
           )}
 
           {/* Details */}
@@ -164,23 +164,23 @@ export default function ReportarPage() {
                 ✅ Ubicación capturada — se publicará aproximada (80–250 m de diferencia).
               </div>
             ) : (
-              <motion.button whileTap={{ scale: 0.97 }} onClick={getGeo} disabled={geoLoading}
+              <Motion.button whileTap={{ scale: 0.97 }} onClick={getGeo} disabled={geoLoading}
                 className="w-full py-2.5 rounded-xl text-sm font-medium"
                 style={{ background: geoLoading ? 'var(--text-3)' : 'var(--accent)', color: '#fff' }}>
                 {geoLoading ? 'Obteniendo ubicación...' : '📍 Usar mi ubicación actual'}
-              </motion.button>
+              </Motion.button>
             )}
             {geoErr && <p className="text-xs mt-2" style={{ color: 'var(--danger)' }}>{geoErr}</p>}
           </div>
 
           {error && <p className="text-sm rounded-xl px-3 py-2 mb-4" style={{ background: '#FEF2F2', color: '#DC2626' }}>{error}</p>}
 
-          <motion.button whileTap={{ scale: 0.97 }} onClick={submit} disabled={submitting}
+          <Motion.button whileTap={{ scale: 0.97 }} onClick={submit} disabled={submitting}
             className="w-full py-4 rounded-2xl font-bold text-white text-base"
             style={{ background: submitting ? 'var(--text-3)' : 'var(--primary)' }}>
             {submitting ? 'Enviando...' : 'Enviar reporte'}
-          </motion.button>
-        </motion.div>
+          </Motion.button>
+        </Motion.div>
       </div>
       <BottomNav />
     </div>

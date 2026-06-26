@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
+import { m as Motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
 import DamageCarousel from '@/components/DamageCarousel';
 import Link from 'next/link';
@@ -66,12 +66,12 @@ function RoleGate({ onPick }: { onPick: (r: Role) => void }) {
   return (
     <div className="grid gap-4">
       {opts.map(o => (
-        <motion.button key={o.r} whileHover={{ y: -3 }} whileTap={{ scale: 0.98 }} onClick={() => onPick(o.r)}
+        <Motion.button key={o.r} whileHover={{ y: -3 }} whileTap={{ scale: 0.98 }} onClick={() => onPick(o.r)}
           className="text-left rounded-3xl p-6" style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
           <div className="text-4xl mb-3">{o.icon}</div>
           <div className="font-display font-bold text-lg mb-1" style={{ color: 'var(--text-1)' }}>{o.t}</div>
           <p className="text-sm" style={{ color: 'var(--text-2)' }}>{o.d}</p>
-        </motion.button>
+        </Motion.button>
       ))}
     </div>
   );
@@ -195,7 +195,7 @@ function EngineerQueue() {
       </div>
       <div className="relative" style={{ height: 460 }}>
         <AnimatePresence>
-          <motion.div key={cur.id} drag="x" dragConstraints={{ left: 0, right: 0 }}
+          <Motion.div key={cur.id} drag="x" dragConstraints={{ left: 0, right: 0 }}
             onDragEnd={(_, info) => { if (info.offset.x > 130) commit('habitable'); else if (info.offset.x < -130) commit('inhabitable'); }}
             initial={{ scale: 0.96, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ opacity: 0 }}
             className="absolute inset-0 rounded-3xl overflow-hidden flex flex-col"
@@ -214,19 +214,19 @@ function EngineerQueue() {
                   {cur.photo_ids.map((_, k) => <span key={k} className="w-6 h-1 rounded-full" style={{ background: k === photoIdx ? '#fff' : 'rgba(255,255,255,0.4)' }} />)}
                 </div>
               )}
-              <motion.div style={{ opacity: yesOp }} className="absolute top-4 left-4 px-3 py-1 rounded-lg text-sm font-extrabold border-2" >
+              <Motion.div style={{ opacity: yesOp }} className="absolute top-4 left-4 px-3 py-1 rounded-lg text-sm font-extrabold border-2" >
                 <span style={{ color: '#16A34A', borderColor: '#16A34A' }} className="px-2 py-1 rounded-lg border-2">HABITABLE</span>
-              </motion.div>
-              <motion.div style={{ opacity: noOp }} className="absolute top-4 right-4">
+              </Motion.div>
+              <Motion.div style={{ opacity: noOp }} className="absolute top-4 right-4">
                 <span style={{ color: '#DC2626', borderColor: '#DC2626' }} className="px-2 py-1 rounded-lg border-2 text-sm font-extrabold">INHABITABLE</span>
-              </motion.div>
+              </Motion.div>
             </div>
             <div className="p-4">
               <div className="font-display font-bold text-base" style={{ color: 'var(--text-1)' }}>{[cur.zona, cur.municipio].filter(Boolean).join(', ') || 'Ubicación no indicada'}</div>
               {cur.building_type && <div className="text-xs mt-0.5" style={{ color: 'var(--text-3)' }}>{cur.building_type}</div>}
               {cur.note && <p className="text-sm mt-1.5" style={{ color: 'var(--text-2)' }}>{cur.note}</p>}
             </div>
-          </motion.div>
+          </Motion.div>
         </AnimatePresence>
       </div>
 
@@ -247,9 +247,9 @@ function EngineerQueue() {
 
       {/* acciones */}
       <div className="flex items-center justify-center gap-4 mt-4">
-        <motion.button whileTap={{ scale: 0.9 }} onClick={() => commit('inhabitable')} className="w-16 h-16 rounded-full flex items-center justify-center text-2xl shadow-lg" style={{ background: '#fff', border: '2px solid #DC2626' }}>❌</motion.button>
-        <motion.button whileTap={{ scale: 0.9 }} onClick={() => commit('incierto')} className="w-12 h-12 rounded-full flex items-center justify-center text-lg shadow" style={{ background: '#fff', border: '2px solid #94A3B8' }}>🤔</motion.button>
-        <motion.button whileTap={{ scale: 0.9 }} onClick={() => commit('habitable')} className="w-16 h-16 rounded-full flex items-center justify-center text-2xl shadow-lg" style={{ background: '#fff', border: '2px solid #16A34A' }}>✅</motion.button>
+        <Motion.button whileTap={{ scale: 0.9 }} onClick={() => commit('inhabitable')} className="w-16 h-16 rounded-full flex items-center justify-center text-2xl shadow-lg" style={{ background: '#fff', border: '2px solid #DC2626' }}>❌</Motion.button>
+        <Motion.button whileTap={{ scale: 0.9 }} onClick={() => commit('incierto')} className="w-12 h-12 rounded-full flex items-center justify-center text-lg shadow" style={{ background: '#fff', border: '2px solid #94A3B8' }}>🤔</Motion.button>
+        <Motion.button whileTap={{ scale: 0.9 }} onClick={() => commit('habitable')} className="w-16 h-16 rounded-full flex items-center justify-center text-2xl shadow-lg" style={{ background: '#fff', border: '2px solid #16A34A' }}>✅</Motion.button>
       </div>
       <div className="flex justify-center gap-6 mt-2 text-[10px] font-semibold" style={{ color: 'var(--text-3)' }}>
         <span>Inhabitable</span><span>No seguro</span><span>Habitable</span>

@@ -1,4 +1,10 @@
 'use client';
+// Bundle Leaflet's CSS same-origin instead of fetching it from unpkg.com at
+// runtime. It's code-split into this (dynamically imported, ssr:false) chunk,
+// so it only downloads when the map actually mounts — and it's served with the
+// app's own caching/compression rather than over an extra cross-origin
+// connection that blocks rendering on slow networks.
+import 'leaflet/dist/leaflet.css';
 import { useEffect, useRef, useState } from 'react';
 import { useSse, HazardEvent } from '@/app/sse-provider';
 import type * as Leaflet from 'leaflet';
@@ -58,7 +64,9 @@ export default function MapView({ initialReports, onReportClick, flyTo, hide }: 
   const markersRef = useRef<Map<string, Leaflet.CircleMarker>>(new Map());
   const fitted = useRef(false);
   const clickRef = useRef(onReportClick);
-  clickRef.current = onReportClick;
+  // Keep the latest click handler without re-running the map effects. Updating
+  // the ref in an effect (not during render) is the idiomatic, lint-clean way.
+  useEffect(() => { clickRef.current = onReportClick; });
   const [ready, setReady] = useState(false);
   const { hazards } = useSse();
 

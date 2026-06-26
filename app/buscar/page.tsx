@@ -1,8 +1,10 @@
 'use client';
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { m as Motion, AnimatePresence } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
 import Link from 'next/link';
+import { thumb } from '@/lib/img';
 
 interface Person {
   id: string;
@@ -29,8 +31,9 @@ const PAGE = 100;
 function PersonCard({ p, onClick }: { p: Person; onClick: () => void }) {
   const [broken, setBroken] = useState(false);
   const color = STATUS_COLOR[p.status] || '#64748B';
+  const photo = thumb(p.photo_path, 400);
   return (
-    <motion.button onClick={onClick} initial={{ opacity: 0 }} animate={{ opacity: 1 }} whileHover={{ y: -3 }}
+    <Motion.button onClick={onClick} initial={{ opacity: 0 }} animate={{ opacity: 1 }} whileHover={{ y: -3 }}
       className="rounded-2xl overflow-hidden text-left w-full cursor-pointer"
       style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
       {/* Portrait 4:5 box. Blurred-cover backdrop + full image (contain) → la persona
@@ -39,10 +42,10 @@ function PersonCard({ p, onClick }: { p: Person; onClick: () => void }) {
         {p.photo_path && !broken ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={p.photo_path} alt="" aria-hidden loading="lazy" referrerPolicy="no-referrer"
+            <img src={photo} alt="" aria-hidden loading="lazy" decoding="async" referrerPolicy="no-referrer"
               className="absolute inset-0 w-full h-full object-cover" style={{ filter: 'blur(16px) brightness(0.75)', transform: 'scale(1.18)' }} />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={p.photo_path} alt={p.display_name} loading="lazy" referrerPolicy="no-referrer"
+            <img src={photo} alt={p.display_name} loading="lazy" decoding="async" referrerPolicy="no-referrer"
               className="absolute inset-0 w-full h-full object-contain" onError={() => setBroken(true)} />
           </>
         ) : (
@@ -67,7 +70,7 @@ function PersonCard({ p, onClick }: { p: Person; onClick: () => void }) {
           <div className="text-[10px] mt-1" style={{ color: 'var(--text-3)' }}>{p.cedula_masked}</div>
         ) : null}
       </div>
-    </motion.button>
+    </Motion.button>
   );
 }
 
@@ -80,6 +83,7 @@ function DetailModal({ p, onClose }: { p: Person; onClose: () => void }) {
   const [err, setErr] = useState('');
   const [broken, setBroken] = useState(false);
   const [detail, setDetail] = useState<PersonDetail | null>(null);
+  const photo = thumb(p.photo_path, 800);
   const color = STATUS_COLOR[p.status] || '#64748B';
 
   useEffect(() => {
@@ -104,20 +108,20 @@ function DetailModal({ p, onClose }: { p: Person; onClose: () => void }) {
   }
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+    <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(15,23,42,0.55)' }}
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0 }}
+      <Motion.div initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0 }}
         className="w-full max-w-md rounded-3xl overflow-hidden max-h-[90vh] overflow-y-auto" style={{ background: '#fff' }}>
         <div className="relative">
           <div className="w-full" style={{ aspectRatio: '3/4', maxHeight: '52vh', background: '#0B1220', position: 'relative', overflow: 'hidden' }}>
             {p.photo_path && !broken ? (
               <>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.photo_path} alt="" aria-hidden referrerPolicy="no-referrer"
+                <img src={photo} alt="" aria-hidden loading="lazy" decoding="async" referrerPolicy="no-referrer"
                   className="absolute inset-0 w-full h-full object-cover" style={{ filter: 'blur(20px) brightness(0.7)', transform: 'scale(1.2)' }} />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.photo_path} alt={p.display_name} referrerPolicy="no-referrer"
+                <img src={photo} alt={p.display_name} decoding="async" referrerPolicy="no-referrer"
                   className="absolute inset-0 w-full h-full object-contain" onError={() => setBroken(true)} />
               </>
             ) : (
@@ -204,32 +208,33 @@ function DetailModal({ p, onClose }: { p: Person; onClose: () => void }) {
             )}
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </Motion.div>
+    </Motion.div>
   );
 }
 
-export default function BuscarPage() {
-  const [query, setQuery] = useState('');
-  const [activeQ, setActiveQ] = useState('');
-  const [estado, setEstado] = useState<'' | 'seeking_info' | 'found_alive'>('');
+function BuscarPageContent() {
+  // Filtros iniciales desde la URL (?estado=found_alive, ?q=). Leerlos con
+  // useSearchParams (en render, dentro de un <Suspense>) en vez de en un effect
+  // evita el doble render y el desajuste de hidratación que daba el patrón
+  // anterior de setState-en-effect.
+  const searchParams = useSearchParams();
+  const urlEstado = searchParams.get('estado');
+  const initEstado: '' | 'seeking_info' | 'found_alive' =
+    urlEstado === 'found_alive' || urlEstado === 'seeking_info' ? urlEstado : '';
+  const initQ = searchParams.get('q') || '';
+
+  const [query, setQuery] = useState(initQ);
+  const [activeQ, setActiveQ] = useState(initQ);
+  const [estado, setEstado] = useState<'' | 'seeking_info' | 'found_alive'>(initEstado);
   const [people, setPeople] = useState<Person[]>([]);
-  const [offset, setOffset] = useState(0);
+  const offsetRef = useRef(0);
   const [loading, setLoading] = useState(true);
   const [more, setMore] = useState(true);
   const [stats, setStats] = useState<{ missing: number; found: number; total: number } | null>(null);
   const [selected, setSelected] = useState<Person | null>(null);
 
   useEffect(() => { fetch('/api/persons/stats').then(r => r.json()).then(setStats).catch(() => {}); }, []);
-
-  // Lee filtros desde la URL (?estado=found_alive, ?q=) al entrar
-  useEffect(() => {
-    const sp = new URLSearchParams(window.location.search);
-    const e = sp.get('estado');
-    if (e === 'found_alive' || e === 'seeking_info') setEstado(e);
-    const q0 = sp.get('q');
-    if (q0) { setQuery(q0); setActiveQ(q0); }
-  }, []);
 
   const reqId = useRef(0);
   const load = useCallback(async (off: number, q: string, est: string, append: boolean) => {
@@ -246,14 +251,18 @@ export default function BuscarPage() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { setOffset(0); load(0, activeQ, estado, false); }, [activeQ, estado, load]);
+  // Recarga al cambiar el filtro/búsqueda. `load` pone setLoading(true) de forma
+  // síncrona, que es justo lo que la regla marca; pero disparar una carga de datos
+  // al cambiar dependencias es el patrón correcto y deseado aquí.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { offsetRef.current = 0; load(0, activeQ, estado, false); }, [activeQ, estado, load]);
 
-  function loadMore() { const o = offset + PAGE; setOffset(o); load(o, activeQ, estado, true); }
+  function loadMore() { const o = offsetRef.current + PAGE; offsetRef.current = o; load(o, activeQ, estado, true); }
 
   return (
     <div className="min-h-screen pb-24" style={{ background: 'var(--bg)' }}>
       <div className="max-w-5xl mx-auto px-4 pt-8">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+        <Motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center justify-between gap-3 mb-1 flex-wrap">
             <h1 className="font-display text-2xl font-bold" style={{ color: 'var(--text-1)' }}>🔎 Personas</h1>
             {stats && (
@@ -273,10 +282,10 @@ export default function BuscarPage() {
               placeholder="Buscar por nombre…"
               className="flex-1 rounded-2xl px-4 py-3 text-sm outline-none"
               style={{ border: '1.5px solid var(--border)', background: 'var(--surface)', color: 'var(--text-1)' }} />
-            <motion.button whileTap={{ scale: 0.95 }} onClick={() => setActiveQ(query.trim())}
+            <Motion.button whileTap={{ scale: 0.95 }} onClick={() => setActiveQ(query.trim())}
               className="px-5 py-3 rounded-2xl text-sm font-semibold text-white" style={{ background: 'var(--primary)', flexShrink: 0 }}>
               Buscar
-            </motion.button>
+            </Motion.button>
           </div>
 
           <div className="flex gap-2 mb-5">
@@ -304,23 +313,23 @@ export default function BuscarPage() {
 
           {more && !loading && people.length > 0 && (
             <div className="text-center mt-6">
-              <motion.button whileTap={{ scale: 0.97 }} onClick={loadMore}
+              <Motion.button whileTap={{ scale: 0.97 }} onClick={loadMore}
                 className="px-6 py-3 rounded-2xl text-sm font-semibold" style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-1)', boxShadow: 'var(--shadow-sm)' }}>
                 Mostrar más personas
-              </motion.button>
+              </Motion.button>
             </div>
           )}
 
           <div className="mt-8 pt-6 flex flex-wrap gap-3 justify-between items-center" style={{ borderTop: '1px solid var(--border)' }}>
             <p className="text-xs" style={{ color: 'var(--text-3)' }}>Datos de carteles públicos y registros comunitarios. Los teléfonos de contacto se mantienen privados.</p>
             <Link href="/reportar-persona">
-              <motion.div whileTap={{ scale: 0.97 }}
+              <Motion.div whileTap={{ scale: 0.97 }}
                 className="px-5 py-2.5 rounded-2xl text-sm font-semibold text-center text-white" style={{ background: 'var(--accent)' }}>
                 📋 Reportar persona
-              </motion.div>
+              </Motion.div>
             </Link>
           </div>
-        </motion.div>
+        </Motion.div>
       </div>
 
       <AnimatePresence>
@@ -329,5 +338,14 @@ export default function BuscarPage() {
 
       <BottomNav />
     </div>
+  );
+}
+
+// useSearchParams requiere un límite de Suspense para mantener el render estático.
+export default function BuscarPage() {
+  return (
+    <Suspense>
+      <BuscarPageContent />
+    </Suspense>
   );
 }

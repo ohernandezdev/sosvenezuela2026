@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m as Motion } from 'framer-motion';
 import Link from 'next/link';
 
 interface Article { id: string; title: string; url: string; source: string | null; published_at: string | null }
@@ -29,7 +29,7 @@ export default function NewsSection() {
       </div>
       <div className="grid gap-2.5">
         {news.map((a, i) => (
-          <motion.a key={a.id} href={a.url} target="_blank" rel="noopener noreferrer"
+          <Motion.a key={a.id} href={a.url} target="_blank" rel="noopener noreferrer"
             initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: Math.min(i * 0.05, 0.3) }}
             className="flex items-center gap-3 rounded-2xl px-4 py-3 transition-transform hover:scale-[1.005]"
             style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
@@ -41,7 +41,7 @@ export default function NewsSection() {
               </div>
             </div>
             <span className="text-xs flex-none" style={{ color: 'var(--text-3)' }}>↗</span>
-          </motion.a>
+          </Motion.a>
         ))}
       </div>
     </section>

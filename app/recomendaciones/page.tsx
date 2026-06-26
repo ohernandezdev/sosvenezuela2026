@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as Motion, AnimatePresence } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
 
 const SECTIONS = [
@@ -165,7 +165,7 @@ export default function RecomendacionesPage() {
   return (
     <div className="min-h-screen pb-24" style={{ background: 'var(--bg)' }}>
       <div className="max-w-lg mx-auto px-4 pt-8">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+        <Motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-1)' }}>🩹 Primeros auxilios</h1>
           <p className="text-sm mb-2" style={{ color: 'var(--text-2)' }}>
             Ante cualquier emergencia llama al <strong>171</strong> (emergencias Venezuela).
@@ -177,7 +177,7 @@ export default function RecomendacionesPage() {
 
           <div className="space-y-3">
             {SECTIONS.map(s => (
-              <motion.div key={s.id}
+              <Motion.div key={s.id}
                 className="rounded-2xl overflow-hidden"
                 style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
                 <button
@@ -185,12 +185,12 @@ export default function RecomendacionesPage() {
                   className="w-full px-5 py-4 flex items-center gap-3 text-left">
                   <span className="text-2xl">{s.icon}</span>
                   <span className="flex-1 font-semibold text-sm" style={{ color: 'var(--text-1)' }}>{s.title}</span>
-                  <motion.span animate={{ rotate: open === s.id ? 180 : 0 }}
-                    style={{ color: 'var(--text-3)' }}>▾</motion.span>
+                  <Motion.span animate={{ rotate: open === s.id ? 180 : 0 }}
+                    style={{ color: 'var(--text-3)' }}>▾</Motion.span>
                 </button>
                 <AnimatePresence>
                   {open === s.id && (
-                    <motion.div
+                    <Motion.div
                       initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
                       <div className="px-5 pb-5">
@@ -200,10 +200,10 @@ export default function RecomendacionesPage() {
                           {s.content}
                         </pre>
                       </div>
-                    </motion.div>
+                    </Motion.div>
                   )}
                 </AnimatePresence>
-              </motion.div>
+              </Motion.div>
             ))}
           </div>
 
@@ -212,7 +212,7 @@ export default function RecomendacionesPage() {
             <div className="text-3xl font-black" style={{ color: '#DC2626' }}>171</div>
             <div className="text-xs mt-1" style={{ color: '#713F12' }}>Protección Civil — Venezuela</div>
           </div>
-        </motion.div>
+        </Motion.div>
       </div>
       <BottomNav />
     </div>

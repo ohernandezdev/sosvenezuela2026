@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { m as Motion } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
 
 const STATUSES = [
@@ -51,18 +51,18 @@ export default function ReportarPersonaPage() {
 
   if (done) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg)' }}>
-      <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="text-center p-8">
+      <Motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="text-center p-8">
         <div className="text-6xl mb-4">✅</div>
         <h2 className="text-xl font-bold" style={{ color: 'var(--text-1)' }}>Reporte enviado</h2>
         <p className="text-sm mt-2" style={{ color: 'var(--text-2)' }}>Si hay avisos activos sobre esta cédula, los usuarios recibirán una notificación.</p>
-      </motion.div>
+      </Motion.div>
     </div>
   );
 
   return (
     <div className="min-h-screen pb-24" style={{ background: 'var(--bg)' }}>
       <div className="max-w-lg mx-auto px-4 pt-8">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+        <Motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-1)' }}>📋 Reportar persona</h1>
           <p className="text-sm mb-6" style={{ color: 'var(--text-2)' }}>
             Los datos sensibles (cédula completa, teléfono) son privados. El público solo ve nombre parcial y estado.
@@ -168,13 +168,13 @@ export default function ReportarPersonaPage() {
 
             {error && <p className="text-sm rounded-xl px-3 py-2" style={{ background: '#FEF2F2', color: '#DC2626' }}>{error}</p>}
 
-            <motion.button whileTap={{ scale: 0.97 }} type="submit" disabled={submitting}
+            <Motion.button whileTap={{ scale: 0.97 }} type="submit" disabled={submitting}
               className="w-full py-4 rounded-2xl font-bold text-white"
               style={{ background: submitting ? 'var(--text-3)' : 'var(--primary)' }}>
               {submitting ? 'Enviando...' : 'Enviar reporte de persona'}
-            </motion.button>
+            </Motion.button>
           </form>
-        </motion.div>
+        </Motion.div>
       </div>
       <BottomNav />
     </div>

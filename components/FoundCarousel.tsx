@@ -1,22 +1,24 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as Motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { thumb } from '@/lib/img';
 
 interface P { id: string; display_name: string; municipio: string | null; parroquia: string | null; hospital_name: string | null; photo_path: string | null }
 
 function Card({ p }: { p: P }) {
   const [broken, setBroken] = useState(false);
   const loc = [p.parroquia, p.municipio].filter(Boolean).join(', ');
+  const photo = thumb(p.photo_path, 400);
   return (
     <Link href="/buscar?estado=found_alive" className="block rounded-2xl overflow-hidden" style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
       <div className="relative w-full overflow-hidden" style={{ paddingTop: '116%', background: '#0B1220' }}>
         {p.photo_path && !broken ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={p.photo_path} alt="" aria-hidden loading="lazy" referrerPolicy="no-referrer" className="absolute inset-0 w-full h-full object-cover" style={{ filter: 'blur(16px) brightness(0.7)', transform: 'scale(1.18)' }} />
+            <img src={photo} alt="" aria-hidden loading="lazy" decoding="async" referrerPolicy="no-referrer" className="absolute inset-0 w-full h-full object-cover" style={{ filter: 'blur(16px) brightness(0.7)', transform: 'scale(1.18)' }} />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={p.photo_path} alt={p.display_name} loading="lazy" referrerPolicy="no-referrer" className="absolute inset-0 w-full h-full object-contain" onError={() => setBroken(true)} />
+            <img src={photo} alt={p.display_name} loading="lazy" decoding="async" referrerPolicy="no-referrer" className="absolute inset-0 w-full h-full object-contain" onError={() => setBroken(true)} />
           </>
         ) : (
           <div className="absolute inset-0 flex items-center justify-center font-display font-extrabold text-3xl" style={{ color: '#475569' }}>{(p.display_name || '?').trim().charAt(0).toUpperCase()}</div>
@@ -69,11 +71,11 @@ export default function FoundCarousel() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <AnimatePresence mode="popLayout" initial={false}>
           {visible.map(p => (
-            <motion.div key={p.id} layout
+            <Motion.div key={p.id}
               initial={{ opacity: 0, scale: 0.9, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}>
               <Card p={p} />
-            </motion.div>
+            </Motion.div>
           ))}
         </AnimatePresence>
       </div>

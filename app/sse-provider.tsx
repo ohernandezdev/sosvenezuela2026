@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, createContext, useContext, useState, ReactNode } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { LazyMotion, domAnimation, m as Motion, AnimatePresence } from 'framer-motion';
 
 export interface HazardEvent { id: string; category: string; severity: string; resource_status: string; verification: string; title: string; lat_pub: number; lng_pub: number; municipio: string; parroquia: string; description: string; source_url?: string | null; image_url?: string | null; created_at: string; site_vs30?: number | null; site_class?: string | null; }
 export interface ChatEvent { id: string; body: string; full_name: string; created_at: string; }
@@ -24,11 +24,25 @@ export function SseProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let es: EventSource | null = null;
-    try {
-      es = new EventSource('/api/stream');
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
+    let retries = 0;
+    let everOpened = false; // did we ever get a working connection?
+    let stopped = false;    // component unmounted — stop reconnecting
+
+    const connect = () => {
+      if (stopped) return;
+      try {
+        es = new EventSource('/api/stream');
+      } catch { return; /* EventSource unsupported */ }
+
+      es.onopen = () => { everOpened = true; retries = 0; };
+
       es.addEventListener('hazard', e => {
         const rows: HazardEvent[] = JSON.parse(e.data);
-        setData(d => ({ ...d, hazards: [...d.hazards, ...rows] }));
+        // Cap the array: on a long-lived page (an emergency dashboard people
+        // leave open for hours) this would otherwise grow without bound and
+        // leak memory. Map markers persist independently of this list.
+        setData(d => ({ ...d, hazards: [...d.hazards, ...rows].slice(-1000) }));
       });
       es.addEventListener('chat', e => {
         const rows: ChatEvent[] = JSON.parse(e.data);
@@ -47,17 +61,61 @@ export function SseProvider({ children }: { children: ReactNode }) {
         setToast(row);
         setTimeout(() => setToast(null), 8000);
       });
-      es.onerror = () => { es?.close(); };
-    } catch { /* not logged in */ }
-    return () => es?.close();
+
+      es.onerror = () => {
+        es?.close();
+        es = null;
+        // Only reconnect if we'd previously connected successfully. On flaky
+        // Venezuelan networks a transient drop must NOT kill live updates for
+        // the rest of the session (the old code closed permanently on the
+        // first blip). But if we never connected — e.g. an anonymous visitor
+        // gets 401 from /api/stream — don't hammer the server in a retry loop.
+        if (stopped || !everOpened) return;
+        const delay = Math.min(30000, 1000 * 2 ** retries++); // 1s,2s,4s…30s
+        retryTimer = setTimeout(connect, delay);
+      };
+    };
+
+    // Difiere la conexión SSE hasta que el navegador esté ocioso (o ~2.5s como
+    // tope). El stream es para actualizaciones EN VIVO, que no son urgentes en
+    // los primeros segundos; abrirlo de inmediato compite por el escaso ancho de
+    // banda 3G con la carga crítica (reportes, JS, fuentes). Diferirlo deja que
+    // el contenido inicial llegue primero.
+    type IdleWin = Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (h: number) => void;
+    };
+    const w = typeof window !== 'undefined' ? (window as IdleWin) : undefined;
+    let idleHandle: number | undefined;
+    let startTimer: ReturnType<typeof setTimeout> | undefined;
+    if (w?.requestIdleCallback) {
+      idleHandle = w.requestIdleCallback(() => connect(), { timeout: 2500 });
+    } else {
+      startTimer = setTimeout(connect, 2000);
+    }
+
+    return () => {
+      stopped = true;
+      if (idleHandle !== undefined) w?.cancelIdleCallback?.(idleHandle);
+      if (startTimer) clearTimeout(startTimer);
+      if (retryTimer) clearTimeout(retryTimer);
+      es?.close();
+    };
   }, []);
 
   return (
+    // LazyMotion + the `m` component (aliased `Motion`) ship only the DOM
+    // animation features the app actually uses, dropping framer-motion's
+    // heaviest pieces (drag + layout projection) from the critical-path
+    // bundle. This provider wraps every page, so all `Motion.*` components get
+    // their features here. Loaded statically (not async) so animations are
+    // ready on first paint — no flash of `initial`-hidden content.
+    <LazyMotion features={domAnimation}>
     <SseCtx.Provider value={data}>
       {children}
       <AnimatePresence>
         {toast && (
-          <motion.div key={toast.id}
+          <Motion.div key={toast.id}
             initial={{ x: 120, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 120, opacity: 0 }}
             className="fixed top-4 right-4 z-[9999] max-w-xs rounded-2xl shadow-2xl p-4"
             style={{ background: '#0D9488', color: '#fff' }}>
@@ -65,9 +123,10 @@ export function SseProvider({ children }: { children: ReactNode }) {
             <div className="text-xs mt-1 opacity-90">
               Cédula <strong>{toast.cedula_norm}</strong> fue reportada como <strong>{toast.status}</strong>
             </div>
-          </motion.div>
+          </Motion.div>
         )}
       </AnimatePresence>
     </SseCtx.Provider>
+    </LazyMotion>
   );
 }

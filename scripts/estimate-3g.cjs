@@ -34,7 +34,7 @@ const BEFORE = {
 };
 const AFTER = {
   label: 'esta rama (después)',
-  htmlKB: 11.0, jsCssKB: 237.7, fontsKB: 66.9,  // HTML un poco mayor: lleva los datos
+  htmlKB: 11.0, jsCssKB: 236.7, fontsKB: 66.9,  // HTML un poco mayor: lleva los datos
   externalBlockingOrigins: 0,
   extraOriginsForAssets: 0,
   apiRoundTripsBeforeData: 0,

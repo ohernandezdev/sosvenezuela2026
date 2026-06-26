@@ -15,7 +15,7 @@ reproducible.
 | **Tiempo estimado de carga (Slow 3G)** | **~12.0 s** | **~7.5 s** |
 | Handshakes a orígenes externos render-blocking | 3.6 s (3 orígenes) | 0 s |
 | Round-trips de API antes de ver datos | 2 | 0 |
-| First Load JS (gzip) | 245.8 KB | 237.7 KB |
+| First Load JS (gzip) | 245.8 KB | 236.7 KB |
 
 **≈ 4.5 s más rápido (−38 %)** según el modelo de `scripts/estimate-3g.cjs` (50 KB/s, RTT
 400 ms). Reproducible: `node scripts/estimate-3g.cjs`. Detalle y supuestos abajo.
@@ -58,11 +58,11 @@ bloquean el primer pintado.
 
 | Ruta              | main (antes) | esta rama (después) | Δ |
 |-------------------|-------------:|--------------------:|----:|
-| `/` (home)        | 245.8 KB     | 237.3 KB            | **−8.5 KB** |
-| `/buscar`         | 237.8 KB     | 230.7 KB            | −7.1 KB |
-| `/reportes`       | 236.8 KB     | 229.7 KB            | −7.1 KB |
-| `/recomendaciones`| 237.9 KB     | 230.8 KB            | −7.1 KB |
-| `/reportar`       | 236.1 KB     | 228.9 KB            | −7.2 KB |
+| `/` (home)        | 245.8 KB     | 236.7 KB            | **−9.1 KB** |
+| `/buscar`         | 237.8 KB     | 230.8 KB            | −7.0 KB |
+| `/reportes`       | 236.8 KB     | 229.8 KB            | −7.0 KB |
+| `/recomendaciones`| 237.9 KB     | 230.9 KB            | −7.0 KB |
+| `/reportar`       | 236.1 KB     | 229.0 KB            | −7.1 KB |
 
 El JS restante está dominado por React/React-DOM (~107 KB gzip, no reducible sin cambiar
 de framework) y por el componente monolítico del home. Próximas iteraciones siguen

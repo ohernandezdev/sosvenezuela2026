@@ -56,8 +56,8 @@ export default function AcercaPage() {
             </p>
             <div className="text-center">
               <div className="inline-block rounded-2xl p-3 mb-2" style={{ background: '#F7931A20', border: '1px solid #F7931A40' }}>
-                <img src="/binance-qr.png" alt="QR de apoyo — Binance Pay"
-                  className="w-40 h-40 mx-auto rounded-xl"
+                <img src="/binance-qr.png" alt="QR de apoyo — Binance Pay" loading="lazy" decoding="async"
+                  width={160} height={160} className="w-40 h-40 mx-auto rounded-xl"
                   onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
               </div>
               <p className="text-xs" style={{ color: 'var(--text-3)' }}>Binance Pay · Solo si puedes y quieres 🙏</p>

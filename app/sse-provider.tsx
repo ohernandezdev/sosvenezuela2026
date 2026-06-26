@@ -24,11 +24,25 @@ export function SseProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let es: EventSource | null = null;
-    try {
-      es = new EventSource('/api/stream');
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
+    let retries = 0;
+    let everOpened = false; // did we ever get a working connection?
+    let stopped = false;    // component unmounted — stop reconnecting
+
+    const connect = () => {
+      if (stopped) return;
+      try {
+        es = new EventSource('/api/stream');
+      } catch { return; /* EventSource unsupported */ }
+
+      es.onopen = () => { everOpened = true; retries = 0; };
+
       es.addEventListener('hazard', e => {
         const rows: HazardEvent[] = JSON.parse(e.data);
-        setData(d => ({ ...d, hazards: [...d.hazards, ...rows] }));
+        // Cap the array: on a long-lived page (an emergency dashboard people
+        // leave open for hours) this would otherwise grow without bound and
+        // leak memory. Map markers persist independently of this list.
+        setData(d => ({ ...d, hazards: [...d.hazards, ...rows].slice(-1000) }));
       });
       es.addEventListener('chat', e => {
         const rows: ChatEvent[] = JSON.parse(e.data);
@@ -47,9 +61,28 @@ export function SseProvider({ children }: { children: ReactNode }) {
         setToast(row);
         setTimeout(() => setToast(null), 8000);
       });
-      es.onerror = () => { es?.close(); };
-    } catch { /* not logged in */ }
-    return () => es?.close();
+
+      es.onerror = () => {
+        es?.close();
+        es = null;
+        // Only reconnect if we'd previously connected successfully. On flaky
+        // Venezuelan networks a transient drop must NOT kill live updates for
+        // the rest of the session (the old code closed permanently on the
+        // first blip). But if we never connected — e.g. an anonymous visitor
+        // gets 401 from /api/stream — don't hammer the server in a retry loop.
+        if (stopped || !everOpened) return;
+        const delay = Math.min(30000, 1000 * 2 ** retries++); // 1s,2s,4s…30s
+        retryTimer = setTimeout(connect, delay);
+      };
+    };
+
+    connect();
+
+    return () => {
+      stopped = true;
+      if (retryTimer) clearTimeout(retryTimer);
+      es?.close();
+    };
   }, []);
 
   return (

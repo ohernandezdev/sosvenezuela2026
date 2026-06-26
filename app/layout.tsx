@@ -1,8 +1,29 @@
 import './globals.css';
 import type { Metadata, Viewport } from 'next';
+import { Bricolage_Grotesque, Plus_Jakarta_Sans } from 'next/font/google';
 import { SseProvider } from './sse-provider';
 import Track from './track';
 import type { ReactNode } from 'react';
+
+// Self-hosted fonts: Next downloads & subsets them at build time and serves
+// them same-origin. This removes the render-blocking request to
+// fonts.googleapis.com plus the extra DNS/TLS handshakes to gstatic — a real
+// win on the slow, high-latency networks this site targets. `display: swap`
+// paints text immediately with a fallback while the webfont streams in.
+const fontDisplay = Bricolage_Grotesque({
+  subsets: ['latin'],
+  weight: ['500', '600', '700', '800'],
+  display: 'swap',
+  variable: '--font-bricolage',
+  fallback: ['-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+});
+const fontBody = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+  variable: '--font-jakarta',
+  fallback: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+});
 
 const SITE = 'https://sosvenezuela2026.com';
 const DESC = 'Mapa colaborativo en tiempo real del terremoto M7.5 en Venezuela (24 jun 2026): reportes de daños y colapsos, búsqueda de personas desaparecidas, refugios, primeros auxilios y canal comunitario. Tu ubicación exacta nunca se comparte públicamente.';
@@ -74,13 +95,15 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="es">
+    <html lang="es" className={`${fontDisplay.variable} ${fontBody.variable}`}>
+      <head>
+        {/* Warm up the DNS for the map tile CDN so tiles start downloading
+            sooner once the (lazily-loaded) map mounts. dns-prefetch is cheap
+            and doesn't tie up a connection slot like preconnect would. */}
+        <link rel="dns-prefetch" href="https://basemaps.cartocdn.com" />
+      </head>
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSONLD) }} />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" />
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
         <SseProvider>{children}</SseProvider>
         <Track />
       </body>

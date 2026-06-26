@@ -17,23 +17,26 @@ let lastChatTs   = new Date(Date.now() - 5000).toISOString();
 let lastNotifTs  = new Date(Date.now() - 5000).toISOString();
 let lastCheckinTs = new Date(Date.now() - 5000).toISOString();
 let lastCommentTs = new Date(Date.now() - 5000).toISOString();
-let lastReactionTs = new Date(Date.now() - 5000).toISOString();
 
 let pollStarted = false;
 
-function send(client: SseClient, event: string, data: unknown) {
+function send(id: string, client: SseClient, event: string, data: unknown) {
   try {
     client.controller.enqueue(
       `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`
     );
     client.lastSeen = Date.now();
   } catch {
-    clients.delete(client.userId + Math.random());
+    // The connection is dead (controller closed). Remove it by its real key —
+    // the old code deleted `userId + Math.random()`, a key that never exists,
+    // so dead clients piled up forever (memory leak + a throwing enqueue on
+    // every 2s poll + an inflated "en línea" count).
+    clients.delete(id);
   }
 }
 
 function broadcast(event: string, data: unknown) {
-  clients.forEach(c => send(c, event, data));
+  clients.forEach((c, id) => send(id, c, event, data));
 }
 
 function broadcastPresence() {
@@ -85,9 +88,9 @@ async function poll() {
       if (nq.rows.length) {
         lastNotifTs = nq.rows[nq.rows.length - 1].created_at.toISOString();
         nq.rows.forEach(row => {
-          clients.forEach(c => {
+          clients.forEach((c, id) => {
             if (c.userId === row.watcher_id) {
-              send(c, 'match', row);
+              send(id, c, 'match', row);
             }
           });
         });

@@ -1,5 +1,6 @@
 'use client';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
 import Link from 'next/link';
@@ -209,27 +210,28 @@ function DetailModal({ p, onClose }: { p: Person; onClose: () => void }) {
   );
 }
 
-export default function BuscarPage() {
-  const [query, setQuery] = useState('');
-  const [activeQ, setActiveQ] = useState('');
-  const [estado, setEstado] = useState<'' | 'seeking_info' | 'found_alive'>('');
+function BuscarPageContent() {
+  // Filtros iniciales desde la URL (?estado=found_alive, ?q=). Leerlos con
+  // useSearchParams (en render, dentro de un <Suspense>) en vez de en un effect
+  // evita el doble render y el desajuste de hidratación que daba el patrón
+  // anterior de setState-en-effect.
+  const searchParams = useSearchParams();
+  const urlEstado = searchParams.get('estado');
+  const initEstado: '' | 'seeking_info' | 'found_alive' =
+    urlEstado === 'found_alive' || urlEstado === 'seeking_info' ? urlEstado : '';
+  const initQ = searchParams.get('q') || '';
+
+  const [query, setQuery] = useState(initQ);
+  const [activeQ, setActiveQ] = useState(initQ);
+  const [estado, setEstado] = useState<'' | 'seeking_info' | 'found_alive'>(initEstado);
   const [people, setPeople] = useState<Person[]>([]);
-  const [offset, setOffset] = useState(0);
+  const offsetRef = useRef(0);
   const [loading, setLoading] = useState(true);
   const [more, setMore] = useState(true);
   const [stats, setStats] = useState<{ missing: number; found: number; total: number } | null>(null);
   const [selected, setSelected] = useState<Person | null>(null);
 
   useEffect(() => { fetch('/api/persons/stats').then(r => r.json()).then(setStats).catch(() => {}); }, []);
-
-  // Lee filtros desde la URL (?estado=found_alive, ?q=) al entrar
-  useEffect(() => {
-    const sp = new URLSearchParams(window.location.search);
-    const e = sp.get('estado');
-    if (e === 'found_alive' || e === 'seeking_info') setEstado(e);
-    const q0 = sp.get('q');
-    if (q0) { setQuery(q0); setActiveQ(q0); }
-  }, []);
 
   const reqId = useRef(0);
   const load = useCallback(async (off: number, q: string, est: string, append: boolean) => {
@@ -246,9 +248,13 @@ export default function BuscarPage() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { setOffset(0); load(0, activeQ, estado, false); }, [activeQ, estado, load]);
+  // Recarga al cambiar el filtro/búsqueda. `load` pone setLoading(true) de forma
+  // síncrona, que es justo lo que la regla marca; pero disparar una carga de datos
+  // al cambiar dependencias es el patrón correcto y deseado aquí.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { offsetRef.current = 0; load(0, activeQ, estado, false); }, [activeQ, estado, load]);
 
-  function loadMore() { const o = offset + PAGE; setOffset(o); load(o, activeQ, estado, true); }
+  function loadMore() { const o = offsetRef.current + PAGE; offsetRef.current = o; load(o, activeQ, estado, true); }
 
   return (
     <div className="min-h-screen pb-24" style={{ background: 'var(--bg)' }}>
@@ -329,5 +335,14 @@ export default function BuscarPage() {
 
       <BottomNav />
     </div>
+  );
+}
+
+// useSearchParams requiere un límite de Suspense para mantener el render estático.
+export default function BuscarPage() {
+  return (
+    <Suspense>
+      <BuscarPageContent />
+    </Suspense>
   );
 }

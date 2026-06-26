@@ -1,0 +1,12 @@
+# Levanta el gateway con un comando:  docker compose up
+services:
+  gateway:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SMS_WEBHOOK_SECRET: "${SMS_WEBHOOK_SECRET:-cambia-esto}"
+      PORT: "8080"
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped

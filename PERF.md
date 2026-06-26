@@ -8,6 +8,18 @@ reproducible.
 > móviles con señal mala e intermitente y datos caros/lentos. Cada origen nuevo
 > (DNS + TCP + TLS), cada KB de JS y cada recurso render-blocking cuesta segundos.
 
+## TL;DR — carga del home estimada en Slow 3G
+
+| | main (antes) | esta rama (después) |
+|---|:---:|:---:|
+| **Tiempo estimado de carga (Slow 3G)** | **~12.0 s** | **~7.5 s** |
+| Handshakes a orígenes externos render-blocking | 3.6 s (3 orígenes) | 0 s |
+| Round-trips de API antes de ver datos | 2 | 0 |
+| First Load JS (gzip) | 245.8 KB | 237.7 KB |
+
+**≈ 4.5 s más rápido (−38 %)** según el modelo de `scripts/estimate-3g.cjs` (50 KB/s, RTT
+400 ms). Reproducible: `node scripts/estimate-3g.cjs`. Detalle y supuestos abajo.
+
 ---
 
 ## 1. Cómo se miden las métricas (reproducible)

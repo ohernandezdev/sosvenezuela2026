@@ -76,10 +76,28 @@ export function SseProvider({ children }: { children: ReactNode }) {
       };
     };
 
-    connect();
+    // Difiere la conexión SSE hasta que el navegador esté ocioso (o ~2.5s como
+    // tope). El stream es para actualizaciones EN VIVO, que no son urgentes en
+    // los primeros segundos; abrirlo de inmediato compite por el escaso ancho de
+    // banda 3G con la carga crítica (reportes, JS, fuentes). Diferirlo deja que
+    // el contenido inicial llegue primero.
+    type IdleWin = Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (h: number) => void;
+    };
+    const w = typeof window !== 'undefined' ? (window as IdleWin) : undefined;
+    let idleHandle: number | undefined;
+    let startTimer: ReturnType<typeof setTimeout> | undefined;
+    if (w?.requestIdleCallback) {
+      idleHandle = w.requestIdleCallback(() => connect(), { timeout: 2500 });
+    } else {
+      startTimer = setTimeout(connect, 2000);
+    }
 
     return () => {
       stopped = true;
+      if (idleHandle !== undefined) w?.cancelIdleCallback?.(idleHandle);
+      if (startTimer) clearTimeout(startTimer);
       if (retryTimer) clearTimeout(retryTimer);
       es?.close();
     };

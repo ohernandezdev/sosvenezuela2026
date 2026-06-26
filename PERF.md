@@ -149,6 +149,13 @@ el HTML sale vacío y el cliente hace el fetch de respaldo, sin romperse.
   frío; el navegador sí lo cachea vía `immutable`).
 - Redimensionar también las imágenes **externas** de reportes (`image_url` de noticias),
   que requieren un proxy aparte.
-- Service Worker para carga instantánea en visitas repetidas y primeros auxilios offline.
+- Service Worker para carga instantánea en visitas repetidas y primeros auxilios offline
+  (gran valor para redes inestables). Se preparó pero **no se incluye**: requiere pruebas
+  en navegador (un SW con bugs es difícil de revertir en un sitio de emergencia) y, además,
+  en este Next **los archivos `.js` en `public/` devuelven 404** (`.txt/.png/.svg` sí
+  sirven), así que el SW debe entregarse desde un Route Handler con cabecera
+  `Service-Worker-Allowed: /`. Diseño recomendado: cache-first sólo para estáticos hasheados
+  (`/_next/static/`, inmutables) y fotos `?w=`, y network-first para navegaciones (así el
+  caso online nunca se degrada).
 - Reducir pesos de fuente cargados si el diseño lo permite.
 - Limpiar la deuda de lint preexistente a nivel de proyecto.

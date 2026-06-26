@@ -7,7 +7,10 @@ export default function WelcomeModal() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
+    // localStorage no existe en SSR, así que esto debe leerse tras el montaje;
+    // inicializar el estado en render daría un desajuste de hidratación.
     if (!localStorage.getItem('ve_bienvenida')) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setOpen(true);
     }
   }, []);

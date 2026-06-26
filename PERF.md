@@ -158,4 +158,5 @@ el HTML sale vacío y el cliente hace el fetch de respaldo, sin romperse.
   (`/_next/static/`, inmutables) y fotos `?w=`, y network-first para navegaciones (así el
   caso online nunca se degrada).
 - Reducir pesos de fuente cargados si el diseño lo permite.
-- Limpiar la deuda de lint preexistente a nivel de proyecto.
+- Quedan 10 *warnings* de lint no bloqueantes (variables sin usar, `<img>`); `npm run lint`
+  ya pasa en verde (0 errores).

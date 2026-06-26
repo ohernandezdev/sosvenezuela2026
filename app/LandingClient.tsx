@@ -562,6 +562,22 @@ interface BalanceData {
   official: Record<string, { value: string; label: string; updated_at: string }>;
   official_updated: string | null;
 }
+// Definido a nivel de módulo (no dentro del render de BalancePanel) para no
+// recrear el componente en cada render.
+function BalanceRow({ tag, tagColor, tagBg, items }: { tag: string; tagColor: string; tagBg: string; items: { label: string; value: string }[] }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2.5 py-3">
+      <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full flex-shrink-0"
+        style={{ background: tagBg, color: tagColor }}>{tag}</span>
+      {items.map(it => (
+        <div key={it.label} className="flex items-baseline gap-1.5">
+          <span className="font-display font-extrabold text-sm tabular-nums" style={{ color: 'var(--text-1)' }}>{it.value}</span>
+          <span className="text-[11px]" style={{ color: 'var(--text-3)' }}>{it.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
 function BalancePanel() {
   const [b, setB] = useState<BalanceData | null>(null);
   useEffect(() => { fetch('/api/balance').then(r => r.json()).then(setB).catch(() => {}); }, []);
@@ -577,18 +593,6 @@ function BalancePanel() {
     { label: o.aeropuerto?.label || 'Aeropuerto Maiquetía', value: o.aeropuerto?.value || '—' },
   ];
   const oficialFecha = b?.official_updated ? new Date(b.official_updated).toLocaleDateString('es-VE', { day: '2-digit', month: 'short', year: 'numeric' }) : null;
-  const Row = ({ tag, tagColor, tagBg, items }: { tag: string; tagColor: string; tagBg: string; items: { label: string; value: string }[] }) => (
-    <div className="flex flex-wrap items-center gap-2.5 py-3">
-      <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full flex-shrink-0"
-        style={{ background: tagBg, color: tagColor }}>{tag}</span>
-      {items.map(it => (
-        <div key={it.label} className="flex items-baseline gap-1.5">
-          <span className="font-display font-extrabold text-sm tabular-nums" style={{ color: 'var(--text-1)' }}>{it.value}</span>
-          <span className="text-[11px]" style={{ color: 'var(--text-3)' }}>{it.label}</span>
-        </div>
-      ))}
-    </div>
-  );
   return (
     <div className="rounded-3xl p-5" style={{ background: 'rgba(255,255,255,0.92)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
       <div className="flex items-center justify-between mb-1">
@@ -596,8 +600,8 @@ function BalancePanel() {
         <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: 'rgba(13,148,136,0.1)', color: 'var(--primary)' }}>en vivo</span>
       </div>
       <div className="divide-y" style={{ borderColor: 'var(--border-soft)' }}>
-        <Row tag="Preliminares" tagColor="#9A3412" tagBg="rgba(234,88,12,0.12)" items={prelim} />
-        <Row tag="Confirmadas" tagColor="#15803D" tagBg="rgba(22,163,74,0.12)" items={conf} />
+        <BalanceRow tag="Preliminares" tagColor="#9A3412" tagBg="rgba(234,88,12,0.12)" items={prelim} />
+        <BalanceRow tag="Confirmadas" tagColor="#15803D" tagBg="rgba(22,163,74,0.12)" items={conf} />
       </div>
       <p className="text-[10px] mt-2 leading-relaxed" style={{ color: 'var(--text-3)' }}>
         Edificios colapsados y réplicas se actualizan automáticamente (nuestros reportes · USGS).

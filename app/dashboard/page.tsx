@@ -120,12 +120,12 @@ export default function DashboardPage() {
           {/* CHECK-INS */}
           {checkins.length > 0 && (
             <div className="rounded-3xl p-5 mb-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-              <div className="font-semibold text-sm mb-3" style={{ color: 'var(--text-1)' }}>🙋 Últimos check-ins "Estoy a salvo"</div>
+              <div className="font-semibold text-sm mb-3" style={{ color: 'var(--text-1)' }}>🙋 Últimos check-ins &ldquo;Estoy a salvo&rdquo;</div>
               {checkins.slice(-5).reverse().map(c => (
                 <div key={c.id} className="text-xs mb-2">
                   <span className="font-medium">{c.full_name || 'Alguien'}</span>
                   {c.estado && <span className="ml-1" style={{ color: 'var(--text-2)' }}>desde {c.estado}</span>}
-                  {c.msg && <span className="ml-1 italic" style={{ color: 'var(--text-3)' }}>"{c.msg}"</span>}
+                  {c.msg && <span className="ml-1 italic" style={{ color: 'var(--text-3)' }}>&ldquo;{c.msg}&rdquo;</span>}
                 </div>
               ))}
             </div>

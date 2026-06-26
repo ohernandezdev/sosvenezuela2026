@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { m as Motion, AnimatePresence } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
 import Link from 'next/link';
+import { thumb } from '@/lib/img';
 
 interface Person {
   id: string;
@@ -30,6 +31,7 @@ const PAGE = 100;
 function PersonCard({ p, onClick }: { p: Person; onClick: () => void }) {
   const [broken, setBroken] = useState(false);
   const color = STATUS_COLOR[p.status] || '#64748B';
+  const photo = thumb(p.photo_path, 400);
   return (
     <Motion.button onClick={onClick} initial={{ opacity: 0 }} animate={{ opacity: 1 }} whileHover={{ y: -3 }}
       className="rounded-2xl overflow-hidden text-left w-full cursor-pointer"
@@ -40,10 +42,10 @@ function PersonCard({ p, onClick }: { p: Person; onClick: () => void }) {
         {p.photo_path && !broken ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={p.photo_path} alt="" aria-hidden loading="lazy" decoding="async" referrerPolicy="no-referrer"
+            <img src={photo} alt="" aria-hidden loading="lazy" decoding="async" referrerPolicy="no-referrer"
               className="absolute inset-0 w-full h-full object-cover" style={{ filter: 'blur(16px) brightness(0.75)', transform: 'scale(1.18)' }} />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={p.photo_path} alt={p.display_name} loading="lazy" decoding="async" referrerPolicy="no-referrer"
+            <img src={photo} alt={p.display_name} loading="lazy" decoding="async" referrerPolicy="no-referrer"
               className="absolute inset-0 w-full h-full object-contain" onError={() => setBroken(true)} />
           </>
         ) : (
@@ -81,6 +83,7 @@ function DetailModal({ p, onClose }: { p: Person; onClose: () => void }) {
   const [err, setErr] = useState('');
   const [broken, setBroken] = useState(false);
   const [detail, setDetail] = useState<PersonDetail | null>(null);
+  const photo = thumb(p.photo_path, 800);
   const color = STATUS_COLOR[p.status] || '#64748B';
 
   useEffect(() => {
@@ -115,10 +118,10 @@ function DetailModal({ p, onClose }: { p: Person; onClose: () => void }) {
             {p.photo_path && !broken ? (
               <>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.photo_path} alt="" aria-hidden referrerPolicy="no-referrer"
+                <img src={photo} alt="" aria-hidden loading="lazy" decoding="async" referrerPolicy="no-referrer"
                   className="absolute inset-0 w-full h-full object-cover" style={{ filter: 'blur(20px) brightness(0.7)', transform: 'scale(1.2)' }} />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.photo_path} alt={p.display_name} referrerPolicy="no-referrer"
+                <img src={photo} alt={p.display_name} decoding="async" referrerPolicy="no-referrer"
                   className="absolute inset-0 w-full h-full object-contain" onError={() => setBroken(true)} />
               </>
             ) : (

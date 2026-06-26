@@ -121,6 +121,16 @@ el HTML sale vacío y el cliente hace el fetch de respaldo, sin romperse.
   `next/dynamic` (`ssr:false`): salen del bundle inicial.
 - Home como Server Component con ISR (`revalidate=20`): reportes y cifras se renderizan en
   el servidor e incrustan en el HTML, eliminando 2 round-trips de API en la primera carga.
+- Secciones estáticas del home (CTAs, primeros auxilios, footer) movidas a un Server
+  Component (`HomeStatic`): cero JS de cliente.
+- **Redimensionado de fotos on-the-fly** (`/api/photo/[id]?w=…` con `sharp` → WebP): las
+  fotos de personas se guardan a tamaño completo pero se muestran como miniaturas; ahora
+  los carruseles y el directorio piden ~400 px WebP (~10–20 KB) en vez del original
+  (~100 KB–1 MB). Fail-safe: si el resize falla, se sirve el original. Probablemente el
+  mayor ahorro de **datos** en 3G.
+- QR de Binance re-codificado a PNG con paleta (84 KB → 17.6 KB, −79 %); imágenes de
+  carruseles/directorio con `loading="lazy"` + `decoding="async"`.
+- Dependencia muerta `react-leaflet` eliminada.
 
 **Robustez en red inestable (prevención de bugs)**
 - SSE: reconexión automática con backoff exponencial (1s→30s). Antes la conexión en vivo
@@ -135,9 +145,10 @@ el HTML sale vacío y el cliente hace el fetch de respaldo, sin romperse.
 
 ## 4. Pendiente / siguientes iteraciones
 
-- Migrar también las secciones estáticas de marketing del home a Server Components (CTAs,
-  primeros auxilios, footer) para recortar más JS de cliente.
-- Proxy/redimensionado de imágenes externas (hoy se sirven a tamaño completo con `<img>`).
+- Cachear el resultado del resize de fotos en disco/CDN (hoy se recalcula por request
+  frío; el navegador sí lo cachea vía `immutable`).
+- Redimensionar también las imágenes **externas** de reportes (`image_url` de noticias),
+  que requieren un proxy aparte.
+- Service Worker para carga instantánea en visitas repetidas y primeros auxilios offline.
 - Reducir pesos de fuente cargados si el diseño lo permite.
-- Quitar la dependencia muerta `react-leaflet`.
 - Limpiar la deuda de lint preexistente a nivel de proyecto.

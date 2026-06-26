@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { m as Motion, AnimatePresence } from 'framer-motion';
+import { thumb } from '@/lib/img';
 
 interface Sub {
   id: string; zona: string | null; municipio: string | null; building_type: string | null;
@@ -21,7 +22,7 @@ function Card({ s }: { s: Sub }) {
   const [broken, setBroken] = useState(false);
   const v = verdict(s);
   const loc = [s.zona, s.municipio].filter(Boolean).join(', ') || 'Ubicación no indicada';
-  const photo = s.photo_ids?.[0];
+  const photo = thumb(s.photo_ids?.[0], 500);
   return (
     <div className="rounded-2xl overflow-hidden h-full" style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
       <div className="relative w-full overflow-hidden" style={{ paddingTop: '70%', background: '#0B1220' }}>

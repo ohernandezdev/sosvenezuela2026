@@ -28,9 +28,9 @@ function Card({ s }: { s: Sub }) {
         {photo && !broken ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={photo} alt="" aria-hidden referrerPolicy="no-referrer" className="absolute inset-0 w-full h-full object-cover" style={{ filter: 'blur(16px) brightness(0.6)', transform: 'scale(1.2)' }} />
+            <img src={photo} alt="" aria-hidden loading="lazy" decoding="async" referrerPolicy="no-referrer" className="absolute inset-0 w-full h-full object-cover" style={{ filter: 'blur(16px) brightness(0.6)', transform: 'scale(1.2)' }} />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={photo} alt="Daño estructural" referrerPolicy="no-referrer" className="absolute inset-0 w-full h-full object-contain" onError={() => setBroken(true)} />
+            <img src={photo} alt="Daño estructural" loading="lazy" decoding="async" referrerPolicy="no-referrer" className="absolute inset-0 w-full h-full object-contain" onError={() => setBroken(true)} />
           </>
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-4xl">🏗️</div>

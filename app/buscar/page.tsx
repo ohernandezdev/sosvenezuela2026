@@ -40,10 +40,10 @@ function PersonCard({ p, onClick }: { p: Person; onClick: () => void }) {
         {p.photo_path && !broken ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={p.photo_path} alt="" aria-hidden loading="lazy" referrerPolicy="no-referrer"
+            <img src={p.photo_path} alt="" aria-hidden loading="lazy" decoding="async" referrerPolicy="no-referrer"
               className="absolute inset-0 w-full h-full object-cover" style={{ filter: 'blur(16px) brightness(0.75)', transform: 'scale(1.18)' }} />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={p.photo_path} alt={p.display_name} loading="lazy" referrerPolicy="no-referrer"
+            <img src={p.photo_path} alt={p.display_name} loading="lazy" decoding="async" referrerPolicy="no-referrer"
               className="absolute inset-0 w-full h-full object-contain" onError={() => setBroken(true)} />
           </>
         ) : (

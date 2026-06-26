@@ -78,6 +78,22 @@ se descarga si el usuario llega a verlo.
 En 3G (latencia alta), evitar 2–3 handshakes TLS adicionales suele ahorrar **varios
 segundos** de FCP — más impacto que el propio recorte de JS.
 
+### C) Round-trips de API antes de ver contenido (home)
+
+En 3G la latencia (no el ancho de banda) domina. Cada petición secuencial cuesta un RTT.
+
+| Cascada en la primera carga del home | main (antes) | esta rama (después) |
+|--------------------------------------|:------------:|:-------------------:|
+| Reportes del mapa (`/api/reports`)   | fetch cliente tras hidratar | **incrustado en el HTML** |
+| Cifras de personas (`/api/persons/stats`) | fetch cliente tras hidratar | **incrustado en el HTML** |
+| Round-trips bloqueantes hasta ver datos | **2** (tras descargar+hidratar ~230 KB de JS) | **0** |
+
+`app/page.tsx` pasó a ser un Server Component con **ISR** (`revalidate = 20`): el HTML se
+sirve cacheado (TTFB de página estática) pero ya **incluye** reportes y cifras. Antes el
+usuario veía mapa y contadores vacíos hasta completar: *descargar JS → hidratar → fetch →
+render*. La capa SSE sigue actualizando todo en vivo después. Si no hay BD (p.ej. en build)
+el HTML sale vacío y el cliente hace el fetch de respaldo, sin romperse.
+
 ---
 
 ## 3. Cambios incluidos
@@ -91,6 +107,8 @@ segundos** de FCP — más impacto que el propio recorte de JS.
   bundle crítico las piezas más pesadas (drag + layout projection) que el sitio no usa.
 - Componentes bajo el pliegue (`FoundCarousel`, `NewsSection`, `TweetFeed`) cargados con
   `next/dynamic` (`ssr:false`): salen del bundle inicial.
+- Home como Server Component con ISR (`revalidate=20`): reportes y cifras se renderizan en
+  el servidor e incrustan en el HTML, eliminando 2 round-trips de API en la primera carga.
 
 **Robustez en red inestable (prevención de bugs)**
 - SSE: reconexión automática con backoff exponencial (1s→30s). Antes la conexión en vivo
@@ -105,8 +123,8 @@ segundos** de FCP — más impacto que el propio recorte de JS.
 
 ## 4. Pendiente / siguientes iteraciones
 
-- Migrar las secciones estáticas del home a Server Components (el mayor recorte de JS
-  pendiente; hoy `app/page.tsx` es 100% cliente).
+- Migrar también las secciones estáticas de marketing del home a Server Components (CTAs,
+  primeros auxilios, footer) para recortar más JS de cliente.
 - Proxy/redimensionado de imágenes externas (hoy se sirven a tamaño completo con `<img>`).
 - Reducir pesos de fuente cargados si el diseño lo permite.
 - Quitar la dependencia muerta `react-leaflet`.

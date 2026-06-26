@@ -63,6 +63,39 @@ node scripts/sync.cjs
 node scripts/newsweep.cjs
 ```
 
+## Puente SMS (sin internet)
+
+Tras el terremoto, gran parte de Venezuela quedó **sin datos móviles, solo con SMS**. El SMS
+viaja por el canal de señalización de la red celular, así que sigue funcionando aunque caiga
+internet. El endpoint `POST /api/sms` es un **puente agnóstico del transporte** que deja a
+cualquier persona usar la plataforma por SMS:
+
+| SMS que envía el ciudadano | Acción |
+|---|---|
+| `BIEN Juan Perez, Catia` | Se registra como **a salvo** (estoy bien) |
+| `BUSCAR Maria Gomez` | Busca en el directorio de personas (datos enmascarados) |
+| `VISTO Maria Gomez, Maracay` | Aporta un **avistamiento** de alguien |
+| `DANO Catia: edificio agrietado` | Reporta un **daño estructural** |
+| `ACOPIO Valencia` | Lista **centros de acopio/refugios** cercanos |
+| `AYUDA` | Devuelve la lista de comandos |
+
+Funciona con dos transportes (el núcleo en [`lib/sms.ts`](./lib/sms.ts) es el mismo):
+
+- **Gateway local (recomendado para alcance dentro de Venezuela):** un Android viejo o una
+  Raspberry Pi + módem GSM con SIM venezolana, corriendo `android-sms-gateway`/Gammu. El
+  ciudadano escribe a un **número local** (SMS nacional barato y con buena entrega). El nodo
+  apunta su webhook a `…/api/sms?key=$SMS_WEBHOOK_SECRET` y responde el JSON `{ reply, to }`.
+- **Twilio:** manda `From`/`Body` (form-urlencoded) y recibe **TwiML** de vuelta. Mejor para
+  avisar a la **diáspora** (números fuera de Venezuela); caro y poco fiable hacia Venezuela.
+
+El endpoint exige el secreto `SMS_WEBHOOK_SECRET`, limita a 12 SMS/min por número, pasa el
+texto libre por el filtro anti-fraude (`lib/moderacion.ts`) y nunca expone datos de contacto.
+Aplica el esquema una vez con:
+
+```bash
+psql "$DATABASE_URL_UNPOOLED" -f scripts/sms.sql
+```
+
 ## Build de producción
 
 ```bash

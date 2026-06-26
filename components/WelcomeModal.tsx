@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as Motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
 export default function WelcomeModal() {
@@ -20,14 +20,14 @@ export default function WelcomeModal() {
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-[9998] flex items-end sm:items-center justify-center p-4"
           style={{ background: 'rgba(15,23,42,0.5)', backdropFilter: 'blur(4px)' }}
         >
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 24 }}
@@ -51,7 +51,7 @@ export default function WelcomeModal() {
                 { icon: '🔎', label: 'Buscar a alguien', href: '/buscar' },
                 { icon: '🩹', label: 'Ver recomendaciones de seguridad', href: '/recomendaciones' },
               ].map((item, i) => (
-                <motion.div
+                <Motion.div
                   key={item.href}
                   initial={{ opacity: 0, x: -12 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -63,7 +63,7 @@ export default function WelcomeModal() {
                     <span className="text-xl">{item.icon}</span>
                     {item.label}
                   </Link>
-                </motion.div>
+                </Motion.div>
               ))}
             </div>
 
@@ -71,16 +71,16 @@ export default function WelcomeModal() {
               🔒 Tus datos están protegidos. Solo compartes lo que decides. <strong>Nadie te pedirá dinero a cambio de ayuda.</strong>
             </div>
 
-            <motion.button
+            <Motion.button
               whileTap={{ scale: 0.97 }}
               onClick={cerrar}
               className="w-full py-3.5 rounded-2xl font-semibold text-white text-sm"
               style={{ background: 'var(--primary)' }}
             >
               Entendido, abrir el mapa →
-            </motion.button>
-          </motion.div>
-        </motion.div>
+            </Motion.button>
+          </Motion.div>
+        </Motion.div>
       )}
     </AnimatePresence>
   );

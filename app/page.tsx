@@ -1,12 +1,17 @@
 'use client';
 import dynamic from 'next/dynamic';
 import { useEffect, useState, useMemo, useRef } from 'react';
-import { motion, AnimatePresence, useReducedMotion, type Variants } from 'framer-motion';
+import { m as Motion, AnimatePresence, useReducedMotion, type Variants } from 'framer-motion';
 import Link from 'next/link';
 import { useSse, HazardEvent, ChatEvent } from './sse-provider';
-import TweetFeed from '@/components/TweetFeed';
-import FoundCarousel from '@/components/FoundCarousel';
-import NewsSection from '@/components/NewsSection';
+
+// Componentes bajo el pliegue (carruseles, noticias, tweets): cada uno es un
+// display de datos puramente cliente que hace su propio fetch y devuelve null
+// si no hay datos. Cargarlos con next/dynamic (ssr:false) los saca del bundle
+// inicial y de la ruta crítica — sólo se descargan cuando el usuario baja.
+const TweetFeed = dynamic(() => import('@/components/TweetFeed'), { ssr: false });
+const FoundCarousel = dynamic(() => import('@/components/FoundCarousel'), { ssr: false });
+const NewsSection = dynamic(() => import('@/components/NewsSection'), { ssr: false });
 
 const MapView = dynamic(() => import('@/components/MapView'), {
   ssr: false,
@@ -182,11 +187,11 @@ export default function LandingPage() {
 
             <div className="flex items-center gap-2">
               <Link href="/login" className="hidden sm:block">
-                <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
+                <Motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
                   className="px-4 py-2.5 rounded-xl text-[13px] font-semibold text-white sheen-card"
                   style={{ background: 'var(--primary)', boxShadow: 'var(--shadow-teal)' }}>
                   Reportar / Buscar
-                </motion.div>
+                </Motion.div>
               </Link>
               <button onClick={() => setMenuOpen(o => !o)} aria-label="Abrir menú" aria-expanded={menuOpen}
                 className="md:hidden flex items-center justify-center w-11 h-11 rounded-xl transition-colors"
@@ -244,7 +249,7 @@ export default function LandingPage() {
           {/* Mobile dropdown */}
           <AnimatePresence>
             {menuOpen && (
-              <motion.nav initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+              <Motion.nav initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
                 className="md:hidden overflow-hidden glass" style={{ borderTop: '1px solid var(--border)' }}>
                 <div className="px-4 py-3 space-y-1">
@@ -261,43 +266,43 @@ export default function LandingPage() {
                     Reportar / Buscar persona
                   </Link>
                 </div>
-              </motion.nav>
+              </Motion.nav>
             )}
           </AnimatePresence>
         </header>
 
         {/* ── COMPACT HERO ────────────────────────── */}
-        <motion.section variants={stagger} initial="hidden" animate="show"
+        <Motion.section variants={stagger} initial="hidden" animate="show"
           className="px-4 pt-8 pb-6 text-center max-w-3xl mx-auto">
-          <motion.h1 variants={rise}
+          <Motion.h1 variants={rise}
             className="font-display text-[2.25rem] leading-[1.05] sm:text-5xl font-extrabold mb-4"
             style={{ color: 'var(--text-1)' }}>
             Red de apoyo <span className="shimmer-text">ciudadana en vivo</span>
-          </motion.h1>
-          <motion.p variants={rise}
+          </Motion.h1>
+          <Motion.p variants={rise}
             className="text-[15px] sm:text-base mb-6 max-w-xl mx-auto leading-relaxed" style={{ color: 'var(--text-2)' }}>
             Reporta daños y busca personas en el mapa en tiempo real.
             <strong style={{ color: 'var(--text-1)' }}> Tu ubicación exacta nunca se comparte.</strong>
-          </motion.p>
-          <motion.div variants={rise} className="grid sm:grid-cols-3 gap-3 max-w-2xl mx-auto">
+          </Motion.p>
+          <Motion.div variants={rise} className="grid sm:grid-cols-3 gap-3 max-w-2xl mx-auto">
             {[
               { href: '/reportar', icon: '📍', label: 'Reportar un daño', sub: 'Edificios, gas, vías…', grad: 'linear-gradient(135deg,#0D9488,#0F766E)', glow: '0 12px 30px -8px rgba(13,148,136,0.55)' },
               { href: '/buscar', icon: '🔎', label: 'Buscar persona', sub: 'Directorio de desaparecidos', grad: 'linear-gradient(135deg,#0EA5E9,#0369A1)', glow: '0 12px 30px -8px rgba(14,165,233,0.55)' },
               { href: '/validar', icon: '🏗️', label: 'Validar daños', sub: 'Residentes e ingenieros', grad: 'linear-gradient(135deg,#F59E0B,#D97706)', glow: '0 12px 30px -8px rgba(245,158,11,0.6)' },
             ].map(b => (
               <Link key={b.href} href={b.href}>
-                <motion.div whileHover={{ scale: 1.04, y: -4 }} whileTap={{ scale: 0.97 }}
+                <Motion.div whileHover={{ scale: 1.04, y: -4 }} whileTap={{ scale: 0.97 }}
                   transition={{ type: 'spring', stiffness: 380, damping: 17 }}
                   className="flex flex-col items-center justify-center gap-1.5 px-4 py-5 rounded-3xl text-white sheen-card h-full"
                   style={{ background: b.grad, boxShadow: b.glow }}>
                   <span className="flex items-center justify-center w-12 h-12 rounded-2xl text-2xl mb-0.5" style={{ background: 'rgba(255,255,255,0.18)' }}>{b.icon}</span>
                   <span className="font-display font-extrabold text-base leading-tight">{b.label}</span>
                   <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.85)' }}>{b.sub}</span>
-                </motion.div>
+                </Motion.div>
               </Link>
             ))}
-          </motion.div>
-        </motion.section>
+          </Motion.div>
+        </Motion.section>
 
         {/* ── MAP (HERO CENTERPIECE) ──────────────── */}
         <section id="mapa" className="px-4 max-w-6xl mx-auto mb-12 scroll-mt-24">
@@ -351,7 +356,7 @@ export default function LandingPage() {
                 {selected ? (
                   <ReportDetail key={selected.id} report={selected} authed={authed} onClose={() => setSelected(null)} />
                 ) : (
-                  <motion.div key="severity" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  <Motion.div key="severity" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                     className="rounded-3xl p-5" style={{ background: 'rgba(255,255,255,0.9)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
                     <div className="font-display text-sm font-bold mb-4" style={{ color: 'var(--text-1)' }}>Estado actual</div>
                     <div className="space-y-3.5">
@@ -362,7 +367,7 @@ export default function LandingPage() {
                             <span className="font-bold tabular-nums" style={{ color: SEV_COLORS[k] }}>{bySev[k]}</span>
                           </div>
                           <div className="h-2 rounded-full overflow-hidden" style={{ background: '#F1F5F9' }}>
-                            <motion.div initial={{ width: 0 }}
+                            <Motion.div initial={{ width: 0 }}
                               animate={{ width: allReports.length ? `${(bySev[k] / allReports.length) * 100}%` : '0%' }}
                               transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
                               className="h-full rounded-full" style={{ background: `linear-gradient(90deg, ${SEV_COLORS[k]}, ${SEV_COLORS[k]}cc)` }} />
@@ -370,7 +375,7 @@ export default function LandingPage() {
                         </div>
                       ))}
                     </div>
-                  </motion.div>
+                  </Motion.div>
                 )}
               </AnimatePresence>
 
@@ -380,7 +385,7 @@ export default function LandingPage() {
 
               <AnimatePresence>
                 {checkins.length > 0 && (
-                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+                  <Motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
                     className="rounded-3xl p-5 overflow-hidden" style={{ background: 'rgba(240,253,244,0.9)', border: '1px solid #86EFAC' }}>
                     <div className="font-display text-sm font-bold mb-3" style={{ color: '#15803D' }}>🙋 Estoy a salvo</div>
                     {checkins.slice(-3).reverse().map(c => (
@@ -390,7 +395,7 @@ export default function LandingPage() {
                         {c.msg && <span style={{ color: '#15803D' }}> · &ldquo;{c.msg}&rdquo;</span>}
                       </div>
                     ))}
-                  </motion.div>
+                  </Motion.div>
                 )}
               </AnimatePresence>
             </div>
@@ -409,7 +414,7 @@ export default function LandingPage() {
         </section>
 
         {/* ── SISMOS DETAIL ───────────────────────── */}
-        <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-60px' }}
+        <Motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-60px' }}
           className="px-4 max-w-6xl mx-auto mb-12">
           <div className="rounded-2xl p-4 sm:p-5" style={{ background: 'rgba(254,242,242,0.85)', border: '1px solid #FECACA', boxShadow: 'var(--shadow-sm)' }}>
             <div className="flex flex-wrap gap-4 items-start">
@@ -426,7 +431,7 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </Motion.div>
 
         {/* ── BALANCE DE CIFRAS ───────────────────── */}
         <section className="px-4 max-w-6xl mx-auto mb-12">
@@ -435,16 +440,16 @@ export default function LandingPage() {
 
         {/* ── CTAs ───────────────────────────────── */}
         <section className="px-4 max-w-6xl mx-auto mb-12">
-          <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}
+          <Motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}
             className="grid sm:grid-cols-3 gap-4">
             {[
               { icon: '📍', title: 'Reportar daño', desc: 'Marca edificios colapsados, fugas de gas, vías bloqueadas o personas atrapadas.', href: '/reportar', color: '#0D9488', bg: 'rgba(240,253,250,0.9)' },
               { icon: '🔎', title: 'Buscar persona', desc: 'Busca a un familiar por cédula, teléfono o nombre. Activa avisos en tiempo real.', href: '/buscar', color: '#0EA5E9', bg: 'rgba(240,249,255,0.9)' },
               { icon: '🩹', title: 'Primeros auxilios', desc: '12 guías basadas en Cruz Roja, OMS y FEMA. Disponibles sin conexión.', href: '/recomendaciones', color: '#7C3AED', bg: 'rgba(245,243,255,0.9)' },
             ].map(item => (
-              <motion.div key={item.href} variants={rise}>
+              <Motion.div key={item.href} variants={rise}>
                 <Link href={item.href}>
-                  <motion.div whileHover={{ y: -5 }} whileTap={{ scale: 0.98 }} transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                  <Motion.div whileHover={{ y: -5 }} whileTap={{ scale: 0.98 }} transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                     className="rounded-3xl p-6 h-full cursor-pointer sheen-card"
                     style={{ background: item.bg, border: `1px solid ${item.color}22`, boxShadow: 'var(--shadow-sm)' }}>
                     <div className="text-3xl mb-3">{item.icon}</div>
@@ -453,11 +458,11 @@ export default function LandingPage() {
                     <div className="mt-4 text-xs font-bold" style={{ color: item.color }}>
                       {item.href === '/recomendaciones' ? 'Ver guías →' : 'Ir →'}
                     </div>
-                  </motion.div>
+                  </Motion.div>
                 </Link>
-              </motion.div>
+              </Motion.div>
             ))}
-          </motion.div>
+          </Motion.div>
         </section>
 
         {/* ── FIRST AID PREVIEW ──────────────────── */}
@@ -466,7 +471,7 @@ export default function LandingPage() {
             <h2 className="font-display text-xl sm:text-2xl font-bold" style={{ color: 'var(--text-1)' }}>Primeros auxilios — más urgentes</h2>
             <Link href="/recomendaciones" className="text-xs font-bold whitespace-nowrap" style={{ color: 'var(--primary)' }}>Ver las 12 guías →</Link>
           </div>
-          <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}
+          <Motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}
             className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { icon: '🏠', title: 'Durante el sismo', tip: 'Agáchate, cúbrete y agárrate. El "triángulo de la vida" es un MITO peligroso.' },
@@ -474,19 +479,19 @@ export default function LandingPage() {
               { icon: '❤️', title: 'RCP', tip: '100–120 compresiones/min, 5 cm profundidad. No pares hasta que llegue ayuda.' },
               { icon: '🆘', title: 'Si quedas atrapado', tip: 'Golpea tuberías, no grites. No enciendas fuego (posible fuga de gas).' },
             ].map(item => (
-              <motion.div key={item.icon} variants={rise}>
+              <Motion.div key={item.icon} variants={rise}>
                 <Link href="/recomendaciones">
-                  <motion.div whileHover={{ y: -4 }} transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                  <Motion.div whileHover={{ y: -4 }} transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                     className="rounded-2xl p-4 h-full cursor-pointer sheen-card"
                     style={{ background: 'rgba(255,255,255,0.9)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
                     <div className="text-2xl mb-2">{item.icon}</div>
                     <div className="font-display font-semibold text-sm mb-1.5" style={{ color: 'var(--text-1)' }}>{item.title}</div>
                     <p className="text-xs leading-relaxed" style={{ color: 'var(--text-2)' }}>{item.tip}</p>
-                  </motion.div>
+                  </Motion.div>
                 </Link>
-              </motion.div>
+              </Motion.div>
             ))}
-          </motion.div>
+          </Motion.div>
         </section>
 
         {/* ── FOOTER ─────────────────────────────── */}
@@ -548,7 +553,7 @@ function ReportDetail({ report, authed, onClose }: { report: HazardEvent; authed
   }
 
   return (
-    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+    <Motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
       className="rounded-3xl p-5" style={{ background: '#fff', border: `1px solid ${color}33`, boxShadow: 'var(--shadow-md)' }}>
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wide" style={{ color }}>
@@ -600,7 +605,7 @@ function ReportDetail({ report, authed, onClose }: { report: HazardEvent; authed
 
           <AnimatePresence>
             {mode && (
-              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+              <Motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
                 <textarea value={reason} onChange={e => setReason(e.target.value)} rows={2} maxLength={200}
                   placeholder={mode === 'confirmo' ? 'Añade contexto (opcional): qué viste, estado actual…' : 'Explica por qué dudas del reporte (requerido)'}
                   className="w-full rounded-xl px-3 py-2 text-xs outline-none resize-none mt-1"
@@ -612,12 +617,12 @@ function ReportDetail({ report, authed, onClose }: { report: HazardEvent; authed
                   style={{ background: state === 'sending' ? '#94A3B8' : 'var(--primary)' }}>
                   {state === 'sending' ? 'Enviando…' : authed ? 'Enviar aporte' : 'Iniciar sesión para enviar'}
                 </button>
-              </motion.div>
+              </Motion.div>
             )}
           </AnimatePresence>
         </>
       )}
-    </motion.div>
+    </Motion.div>
   );
 }
 
@@ -778,7 +783,7 @@ function LiveReportsFeed({ reports, onSelect, selectedId }: { reports: HazardEve
         </div>
       </div>
 
-      <motion.div layout className="space-y-1">
+      <Motion.div className="space-y-1">
         <AnimatePresence mode="popLayout" initial={false}>
           {latest.map(r => {
             const isNew = now - new Date(r.created_at).getTime() < 90_000;
@@ -786,7 +791,7 @@ function LiveReportsFeed({ reports, onSelect, selectedId }: { reports: HazardEve
             const color = r.severity ? SEV_COLORS[r.severity] : 'var(--primary)';
             const meta = CAT_META[r.category] || { icon: '📌', label: r.category };
             return (
-              <motion.div key={r.id} layout onClick={() => onSelect(r)} role="button" tabIndex={0}
+              <Motion.div key={r.id} onClick={() => onSelect(r)} role="button" tabIndex={0}
                 initial={{ opacity: 0, y: -14, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
                 transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 380, damping: 30 }}
@@ -803,20 +808,20 @@ function LiveReportsFeed({ reports, onSelect, selectedId }: { reports: HazardEve
                       <span className="mr-1">{meta.icon}</span>{r.title || meta.label}
                     </span>
                     {isNew && (
-                      <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}
-                        className="flex-shrink-0 text-[8px] font-bold px-1.5 py-0.5 rounded-full text-white" style={{ background: 'var(--primary)' }}>NUEVO</motion.span>
+                      <Motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}
+                        className="flex-shrink-0 text-[8px] font-bold px-1.5 py-0.5 rounded-full text-white" style={{ background: 'var(--primary)' }}>NUEVO</Motion.span>
                     )}
                   </div>
                   <div className="text-[10px] mt-0.5 truncate" style={{ color: 'var(--text-3)' }}>{r.municipio || meta.label} · {timeAgo(r.created_at, now)}</div>
                 </div>
                 <Link href={`/reporte/${r.id}`} onClick={e => e.stopPropagation()}
                   className="text-[10px] flex-shrink-0 font-bold px-2 py-1 rounded-lg" style={{ color: 'var(--primary)', background: 'rgba(13,148,136,0.08)' }}>ver →</Link>
-              </motion.div>
+              </Motion.div>
             );
           })}
         </AnimatePresence>
         {latest.length === 0 && <p className="text-xs text-center py-5" style={{ color: 'var(--text-3)' }}>Esperando reportes…</p>}
-      </motion.div>
+      </Motion.div>
     </div>
   );
 }

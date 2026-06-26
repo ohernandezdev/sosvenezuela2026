@@ -1,5 +1,5 @@
 'use client';
-import { motion } from 'framer-motion';
+import { m as Motion } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
 import Link from 'next/link';
 
@@ -70,7 +70,7 @@ export default function PrivacidadPage() {
   return (
     <div className="min-h-screen pb-24" style={{ background: 'var(--bg)' }}>
       <div className="max-w-2xl mx-auto px-4 pt-8">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+        <Motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-1)' }}>🔒 Privacidad y protección de datos</h1>
           <p className="text-sm mb-2" style={{ color: 'var(--text-2)' }}>
             Esta plataforma fue diseñada con privacidad como requisito central, especialmente para proteger a los más vulnerables en una situación de emergencia.
@@ -82,7 +82,7 @@ export default function PrivacidadPage() {
 
           <div className="space-y-6">
             {SECTIONS.map((s, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+              <Motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
                 className="rounded-2xl p-6" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
                 <div className="flex items-center gap-3 mb-3">
@@ -92,7 +92,7 @@ export default function PrivacidadPage() {
                 <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: 'var(--text-2)' }}>
                   {s.content}
                 </p>
-              </motion.div>
+              </Motion.div>
             ))}
           </div>
 
@@ -106,7 +106,7 @@ export default function PrivacidadPage() {
           <p className="text-xs text-center mt-6" style={{ color: 'var(--text-3)' }}>
             <Link href="/" style={{ color: 'var(--primary)' }}>← Volver al mapa</Link>
           </p>
-        </motion.div>
+        </Motion.div>
       </div>
       <BottomNav />
     </div>

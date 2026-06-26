@@ -1,5 +1,5 @@
 'use client';
-import { motion } from 'framer-motion';
+import { m as Motion } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
 import Link from 'next/link';
 
@@ -7,7 +7,7 @@ export default function AcercaPage() {
   return (
     <div className="min-h-screen pb-24" style={{ background: 'var(--bg)' }}>
       <div className="max-w-lg mx-auto px-4 pt-8">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+        <Motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
 
           <div className="text-center mb-8">
             <div className="text-5xl mb-4">🇻🇪</div>
@@ -71,7 +71,7 @@ export default function AcercaPage() {
             </span>
           </div>
 
-        </motion.div>
+        </Motion.div>
       </div>
       <BottomNav />
     </div>

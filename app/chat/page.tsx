@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as Motion, AnimatePresence } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
 import { useSse, ChatEvent } from '../sse-provider';
 
@@ -51,7 +51,7 @@ export default function ChatPage() {
       <div className="flex-1 overflow-y-auto px-4 py-4 pb-32">
         <AnimatePresence initial={false}>
           {all.map(m => (
-            <motion.div key={m.id}
+            <Motion.div key={m.id}
               initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
               className="mb-3">
               <div className="flex items-baseline gap-2 mb-0.5">
@@ -64,7 +64,7 @@ export default function ChatPage() {
                 style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-1)' }}>
                 {m.body}
               </div>
-            </motion.div>
+            </Motion.div>
           ))}
         </AnimatePresence>
         <div ref={bottomRef} />
@@ -81,11 +81,11 @@ export default function ChatPage() {
             placeholder="Escribe un mensaje..." maxLength={500}
             className="flex-1 rounded-2xl px-4 py-3 text-sm outline-none"
             style={{ border: '1.5px solid var(--border)', background: 'var(--bg)' }} />
-          <motion.button whileTap={{ scale: 0.93 }} onClick={send} disabled={sending}
+          <Motion.button whileTap={{ scale: 0.93 }} onClick={send} disabled={sending}
             className="w-12 h-12 rounded-2xl flex items-center justify-center text-white"
             style={{ background: 'var(--primary)', flexShrink: 0 }}>
             {sending ? '…' : '→'}
-          </motion.button>
+          </Motion.button>
         </div>
       </div>
       <BottomNav />

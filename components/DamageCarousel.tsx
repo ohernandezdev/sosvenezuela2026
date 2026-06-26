@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as Motion, AnimatePresence } from 'framer-motion';
 
 interface Sub {
   id: string; zona: string | null; municipio: string | null; building_type: string | null;
@@ -79,11 +79,11 @@ export default function DamageCarousel() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <AnimatePresence mode="popLayout" initial={false}>
           {visible.map(s => (
-            <motion.div key={s.id} layout
+            <Motion.div key={s.id}
               initial={{ opacity: 0, scale: 0.94, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.94 }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}>
               <Card s={s} />
-            </motion.div>
+            </Motion.div>
           ))}
         </AnimatePresence>
       </div>

@@ -1,7 +1,7 @@
 'use client';
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { m as Motion } from 'framer-motion';
 import Link from 'next/link';
 
 function LoginForm() {
@@ -32,7 +32,7 @@ function LoginForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#F8FAFC' }}>
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+      <Motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-sm rounded-3xl shadow-xl p-8" style={{ background: '#fff' }}>
 
         <Link href="/" className="flex items-center gap-2 mb-8 group">
@@ -47,7 +47,7 @@ function LoginForm() {
         <p className="text-sm mb-6" style={{ color: '#64748B' }}>Accede para reportar o buscar personas</p>
 
         {/* GOOGLE */}
-        <motion.button whileTap={{ scale: 0.97 }} onClick={googleLogin}
+        <Motion.button whileTap={{ scale: 0.97 }} onClick={googleLogin}
           className="w-full flex items-center justify-center gap-3 py-3 rounded-2xl mb-4 font-semibold text-sm"
           style={{ border: '1.5px solid #E2E8F0', background: '#fff', color: '#0F172A' }}>
           <svg width="18" height="18" viewBox="0 0 24 24">
@@ -57,7 +57,7 @@ function LoginForm() {
             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
           </svg>
           Continuar con Google
-        </motion.button>
+        </Motion.button>
 
         <div className="flex items-center gap-3 mb-4">
           <div className="flex-1 h-px" style={{ background: '#E2E8F0' }} />
@@ -81,18 +81,18 @@ function LoginForm() {
               placeholder="········" />
           </div>
           {error && <p className="text-xs rounded-xl px-3 py-2" style={{ background: '#FEF2F2', color: '#DC2626' }}>{error}</p>}
-          <motion.button whileTap={{ scale: 0.97 }} type="submit" disabled={loading}
+          <Motion.button whileTap={{ scale: 0.97 }} type="submit" disabled={loading}
             className="w-full py-3 rounded-xl font-semibold text-white text-sm"
             style={{ background: loading ? '#94A3B8' : '#0D9488' }}>
             {loading ? 'Entrando...' : 'Entrar'}
-          </motion.button>
+          </Motion.button>
         </form>
 
         <p className="text-center text-xs mt-5" style={{ color: '#94A3B8' }}>
           ¿No tienes cuenta?{' '}
           <Link href={`/register?redirect=${redirect}`} className="font-medium" style={{ color: '#0D9488' }}>Regístrate</Link>
         </p>
-      </motion.div>
+      </Motion.div>
     </div>
   );
 }

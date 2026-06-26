@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as Motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
 interface P { id: string; display_name: string; municipio: string | null; parroquia: string | null; hospital_name: string | null; photo_path: string | null }
@@ -69,11 +69,11 @@ export default function FoundCarousel() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <AnimatePresence mode="popLayout" initial={false}>
           {visible.map(p => (
-            <motion.div key={p.id} layout
+            <Motion.div key={p.id}
               initial={{ opacity: 0, scale: 0.9, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}>
               <Card p={p} />
-            </motion.div>
+            </Motion.div>
           ))}
         </AnimatePresence>
       </div>

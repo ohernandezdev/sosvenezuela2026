@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m as Motion } from 'framer-motion';
 import Link from 'next/link';
 
 interface Stats {
@@ -215,7 +215,7 @@ export default function AdminPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+        <Motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="text-2xl font-bold mb-1" style={{ color: '#0F172A' }}>Panel de Administración</h1>
           <p className="text-sm mb-8" style={{ color: '#64748B' }}>SOS Venezuela 2026 — {new Date().toLocaleDateString('es-VE', { dateStyle: 'full' })}</p>
 
@@ -317,7 +317,7 @@ export default function AdminPage() {
           <p className="text-center text-xs mt-8" style={{ color: '#CBD5E1' }}>
             Datos al cargar la página · SOS Venezuela 2026
           </p>
-        </motion.div>
+        </Motion.div>
       </div>
     </div>
   );

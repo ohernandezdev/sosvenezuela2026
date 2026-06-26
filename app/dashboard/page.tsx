@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m as Motion } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
 import { useSse, HazardEvent } from '../sse-provider';
 import Link from 'next/link';
@@ -57,7 +57,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen pb-24" style={{ background: 'var(--bg)' }}>
       <div className="max-w-lg mx-auto px-4 pt-8">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+        <Motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-2xl font-bold" style={{ color: 'var(--text-1)' }}>📊 Estado general</h1>
             <div className="text-xs px-3 py-1 rounded-full" style={{ background: 'var(--primary-light)', color: 'var(--primary)' }}>
@@ -94,7 +94,7 @@ export default function DashboardPage() {
                     <span style={{ color: 'var(--text-2)' }}>{v}</span>
                   </div>
                   <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--bg)' }}>
-                    <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: all.length ? v / all.length : 0 }}
+                    <Motion.div initial={{ scaleX: 0 }} animate={{ scaleX: all.length ? v / all.length : 0 }}
                       transition={{ duration: 0.6, ease: 'easeOut' }}
                       className="h-full rounded-full"
                       style={{ originX: 0, background: (SEV_COLORS as Record<string,string>)[k], width: '100%' }} />
@@ -137,7 +137,7 @@ export default function DashboardPage() {
             <Link href="/" className="flex-1 py-3 rounded-2xl text-sm font-semibold text-center"
               style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-1)' }}>Ver mapa</Link>
           </div>
-        </motion.div>
+        </Motion.div>
       </div>
       <BottomNav />
     </div>

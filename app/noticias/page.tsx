@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m as Motion } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
 import Link from 'next/link';
 
@@ -34,7 +34,7 @@ export default function NoticiasPage() {
         ) : (
           <div className="space-y-3">
             {news.map((a, i) => (
-              <motion.a key={a.id} href={a.url} target="_blank" rel="noopener noreferrer"
+              <Motion.a key={a.id} href={a.url} target="_blank" rel="noopener noreferrer"
                 initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i * 0.02, 0.4) }}
                 className="block rounded-2xl p-4 transition-transform hover:scale-[1.01]"
                 style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
@@ -45,7 +45,7 @@ export default function NoticiasPage() {
                 <div className="font-display font-bold text-[15px] leading-snug mb-1" style={{ color: 'var(--text-1)' }}>{a.title}</div>
                 {a.summary && <p className="text-xs leading-relaxed line-clamp-2" style={{ color: 'var(--text-2)' }}>{a.summary}</p>}
                 <div className="text-[11px] font-semibold mt-1.5" style={{ color: 'var(--primary)' }}>Leer en la fuente ↗</div>
-              </motion.a>
+              </Motion.a>
             ))}
           </div>
         )}

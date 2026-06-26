@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, createContext, useContext, useState, ReactNode } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { LazyMotion, domAnimation, m as Motion, AnimatePresence } from 'framer-motion';
 
 export interface HazardEvent { id: string; category: string; severity: string; resource_status: string; verification: string; title: string; lat_pub: number; lng_pub: number; municipio: string; parroquia: string; description: string; source_url?: string | null; image_url?: string | null; created_at: string; site_vs30?: number | null; site_class?: string | null; }
 export interface ChatEvent { id: string; body: string; full_name: string; created_at: string; }
@@ -86,11 +86,18 @@ export function SseProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
+    // LazyMotion + the `m` component (aliased `Motion`) ship only the DOM
+    // animation features the app actually uses, dropping framer-motion's
+    // heaviest pieces (drag + layout projection) from the critical-path
+    // bundle. This provider wraps every page, so all `Motion.*` components get
+    // their features here. Loaded statically (not async) so animations are
+    // ready on first paint — no flash of `initial`-hidden content.
+    <LazyMotion features={domAnimation}>
     <SseCtx.Provider value={data}>
       {children}
       <AnimatePresence>
         {toast && (
-          <motion.div key={toast.id}
+          <Motion.div key={toast.id}
             initial={{ x: 120, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 120, opacity: 0 }}
             className="fixed top-4 right-4 z-[9999] max-w-xs rounded-2xl shadow-2xl p-4"
             style={{ background: '#0D9488', color: '#fff' }}>
@@ -98,9 +105,10 @@ export function SseProvider({ children }: { children: ReactNode }) {
             <div className="text-xs mt-1 opacity-90">
               Cédula <strong>{toast.cedula_norm}</strong> fue reportada como <strong>{toast.status}</strong>
             </div>
-          </motion.div>
+          </Motion.div>
         )}
       </AnimatePresence>
     </SseCtx.Provider>
+    </LazyMotion>
   );
 }

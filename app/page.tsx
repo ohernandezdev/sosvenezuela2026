@@ -428,6 +428,31 @@ export default function LandingPage() {
           </div>
         </motion.div>
 
+        {/* ── CONECTIVIDAD DE EMERGENCIA (Starlink D2D) ── */}
+        <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-60px' }}
+          className="px-4 max-w-6xl mx-auto mb-12">
+          <Link href="/recomendaciones#conectividad">
+            <motion.div whileHover={{ y: -3 }} transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+              className="rounded-2xl p-4 sm:p-5 cursor-pointer sheen-card"
+              style={{ background: 'rgba(240,249,255,0.9)', border: '1px solid #BAE6FD', boxShadow: 'var(--shadow-sm)' }}>
+              <div className="flex flex-wrap gap-4 items-start">
+                <div className="text-3xl">📡</div>
+                <div className="flex-1 min-w-[220px]">
+                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                    <span className="font-display font-bold text-sm" style={{ color: '#075985' }}>Internet satelital de emergencia — Starlink al teléfono</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" style={{ background: 'rgba(2,132,199,0.12)', color: '#0369A1' }}>Piloto · La Guaira</span>
+                  </div>
+                  <p className="text-xs leading-relaxed" style={{ color: '#0C4A6E' }}>
+                    CONATEL aprobó un piloto de 3 meses (Movistar/Telefónica) para conectar teléfonos directamente a los satélites Starlink en las zonas afectadas, cuando las torres están caídas.
+                    <strong> Aprende cómo mantenerte conectado y aprovechar cada ventana de señal.</strong>
+                  </p>
+                  <div className="text-[11px] font-bold mt-2" style={{ color: '#0284C7' }}>Ver guía de conectividad →</div>
+                </div>
+              </div>
+            </motion.div>
+          </Link>
+        </motion.div>
+
         {/* ── BALANCE DE CIFRAS ───────────────────── */}
         <section className="px-4 max-w-6xl mx-auto mb-12">
           <BalancePanel />
@@ -440,7 +465,7 @@ export default function LandingPage() {
             {[
               { icon: '📍', title: 'Reportar daño', desc: 'Marca edificios colapsados, fugas de gas, vías bloqueadas o personas atrapadas.', href: '/reportar', color: '#0D9488', bg: 'rgba(240,253,250,0.9)' },
               { icon: '🔎', title: 'Buscar persona', desc: 'Busca a un familiar por cédula, teléfono o nombre. Activa avisos en tiempo real.', href: '/buscar', color: '#0EA5E9', bg: 'rgba(240,249,255,0.9)' },
-              { icon: '🩹', title: 'Primeros auxilios', desc: '12 guías basadas en Cruz Roja, OMS y FEMA. Disponibles sin conexión.', href: '/recomendaciones', color: '#7C3AED', bg: 'rgba(245,243,255,0.9)' },
+              { icon: '🩹', title: 'Primeros auxilios', desc: '13 guías basadas en Cruz Roja, OMS y FEMA. Disponibles sin conexión.', href: '/recomendaciones', color: '#7C3AED', bg: 'rgba(245,243,255,0.9)' },
             ].map(item => (
               <motion.div key={item.href} variants={rise}>
                 <Link href={item.href}>
@@ -464,7 +489,7 @@ export default function LandingPage() {
         <section className="px-4 max-w-6xl mx-auto mb-12">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-display text-xl sm:text-2xl font-bold" style={{ color: 'var(--text-1)' }}>Primeros auxilios — más urgentes</h2>
-            <Link href="/recomendaciones" className="text-xs font-bold whitespace-nowrap" style={{ color: 'var(--primary)' }}>Ver las 12 guías →</Link>
+            <Link href="/recomendaciones" className="text-xs font-bold whitespace-nowrap" style={{ color: 'var(--primary)' }}>Ver las 13 guías →</Link>
           </div>
           <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}
             className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -830,7 +855,7 @@ function FirstAidPanel() {
     { icon: '❤️', title: 'RCP', body: '100–120 compresiones/min al centro del pecho, 5 cm profundidad. No pares hasta que llegue ayuda o respire.' },
     { icon: '🦵', title: 'Atrapado > 1 hora', body: 'NO lo liberes súbitamente — riesgo de paro cardíaco. Hidrátalo y espera rescate especializado (síndrome de aplastamiento).' },
     { icon: '💧', title: 'Agua segura', body: 'Hierve 1 minuto o desinfecta con cloro. No bebas agua inundada o cerca de aguas servidas.' },
-    { icon: '📞', title: 'Emergencias', body: 'Llama al 171 (Venezuela). Accede a las 12 guías completas en la sección de Primeros Auxilios.' },
+    { icon: '📞', title: 'Emergencias', body: 'Llama al 171 (Venezuela). Accede a las 13 guías completas en la sección de Primeros Auxilios.' },
   ];
   return (
     <div className="space-y-3">
@@ -846,7 +871,7 @@ function FirstAidPanel() {
       ))}
       <Link href="/recomendaciones">
         <div className="w-full py-3 rounded-2xl text-center text-sm font-semibold text-white mt-2" style={{ background: 'var(--primary)', boxShadow: 'var(--shadow-teal)' }}>
-          Ver todas las 12 guías completas →
+          Ver todas las 13 guías completas →
         </div>
       </Link>
     </div>

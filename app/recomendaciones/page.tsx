@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import BottomNav from '@/components/BottomNav';
 
@@ -142,6 +142,34 @@ Personas con discapacidad:
 Las reacciones de estrés agudo (llanto, parálisis, confusión) son NORMALES. No son signos de debilidad.`
   },
   {
+    id: 13, icon: '📡', title: 'Mantente conectado (red caída)',
+    content: `Cuando las torres, la fibra o la luz fallan, comunicarte salva vidas. Aprovecha cada ventana de señal.
+
+📶 SATÉLITE AL TELÉFONO (Starlink Direct-to-Device)
+CONATEL aprobó un piloto temporal (3 meses) con Movistar/Telefónica para conectar teléfonos directamente a los satélites Starlink, enfocado en La Guaira y zonas afectadas. Qué esperar:
+• Es una PRUEBA: la cobertura es intermitente y no está garantizada.
+• Arranca con mensajes de texto (SMS) — no cuentes aún con llamadas ni datos estables.
+• Funciona en teléfonos compatibles SIN app ni antena extra: se activa solo cuando hay paso de satélite.
+• Necesitas cielo despejado: sal a un espacio abierto, lejos de techos, paredes y árboles, y espera unos minutos.
+
+📲 SI HAY POCA O NINGUNA SEÑAL
+• Envía SMS en vez de llamar: el texto usa muchísimo menos red y reintenta solo hasta que entra.
+• Manda un solo mensaje claro: "Estoy bien / herido. Estoy en [lugar]." Evita repetir llamadas.
+• Acuerda UN contacto fuera de la zona para que todos le escriban y él coordine — es más fácil enviar lejos que cerca.
+• Sube a un punto alto o sal a campo abierto para buscar señal.
+
+🔋 CUIDA LA BATERÍA (puede ser tu única línea)
+• Activa modo de ahorro de energía y baja el brillo.
+• Pon modo avión entre intentos y actívalo solo para enviar.
+• Cierra apps en segundo plano. Apaga el equipo si no lo necesitas.
+
+✅ USA ESTA PLATAFORMA
+• Marca "Estoy a salvo" (check-in): se envía aunque la conexión sea intermitente y avisa a tu gente.
+• Reporta o busca personas cuando recuperes señal; los datos quedan guardados.
+
+⚠️ Ante peligro de vida intenta siempre el 171. El piloto satelital es un apoyo, no reemplaza a emergencias.`
+  },
+  {
     id: 12, icon: '🎒', title: 'Kit de emergencia',
     content: `Para 3 días por persona:
 • 💧 Agua: al menos 4 litros/persona/día
@@ -162,6 +190,17 @@ Las reacciones de estrés agudo (llanto, parálisis, confusión) son NORMALES. N
 export default function RecomendacionesPage() {
   const [open, setOpen] = useState<number | null>(null);
 
+  // Permite enlazar directo a la guía de conectividad (#conectividad): la abre y baja a ella.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (window.location.hash === '#conectividad') {
+      setOpen(13);
+      requestAnimationFrame(() => {
+        document.getElementById('seccion-13')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }, []);
+
   return (
     <div className="min-h-screen pb-24" style={{ background: 'var(--bg)' }}>
       <div className="max-w-lg mx-auto px-4 pt-8">
@@ -177,8 +216,8 @@ export default function RecomendacionesPage() {
 
           <div className="space-y-3">
             {SECTIONS.map(s => (
-              <motion.div key={s.id}
-                className="rounded-2xl overflow-hidden"
+              <motion.div key={s.id} id={`seccion-${s.id}`}
+                className="rounded-2xl overflow-hidden scroll-mt-4"
                 style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
                 <button
                   onClick={() => setOpen(open === s.id ? null : s.id)}
